@@ -5,11 +5,6 @@ services:
       CONFIG_SERVICE_PASSWORD: $CONFIG_SERVICE_PASSWORD
     image: ${CONTAINER_REGISTRY}.azurecr.io/piggymetrics-config
     restart: always
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8888/actuator/health || exit 1"]
-      interval: 30s
-      timeout: 30s
-      retries: 3
     logging:
       options:
         max-size: "10m"
