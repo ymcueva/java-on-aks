@@ -61,20 +61,30 @@ docker run -p 127.0.0.1:8888:8888 ${CONTAINER_REGISTRY}.azurecr.io/config
 kompose convert
 
 kubectl apply -f config-deployment.yaml
+kubectl apply -f config-service.yaml
 kubectl apply -f registry-deployment.yaml
-# kubectl apply -f registry-service.yaml
+kubectl apply -f registry-service.yaml
 kubectl apply -f gateway-deployment.yaml
-# kubectl apply -f gateway-service.yaml
+kubectl apply -f gateway-service.yaml
 kubectl apply -f account-service-deployment.yaml
+kubectl apply -f account-service-service.yaml
 kubectl apply -f auth-service-deployment.yaml
+kubectl apply -f auth-service-service.yaml
 kubectl apply -f statistics-service-deployment.yaml
+kubectl apply -f statistics-service-service.yaml
 kubectl apply -f notification-service-deployment.yaml
+kubectl apply -f notification-service-service.yaml
 
-kubectl expose deployment config --type=LoadBalancer --port=8888 --target-port=8888
-kubectl expose deployment gateway --type=LoadBalancer --port=80 --target-port=4000
-kubectl expose deployment registry --type=LoadBalancer --port=8761 --target-port=8761
-kubectl expose deployment account-service --type=LoadBalancer --port=6000 --target-port=6000
-kubectl expose deployment auth-service --type=LoadBalancer --port=5000 --target-port=5000
+bash-3.2$ kubectl get services
+NAME                   TYPE           CLUSTER-IP     EXTERNAL-IP     PORT(S)          AGE
+account-service        ClusterIP      10.0.195.104   <none>          6000/TCP         4m13s
+auth-service           ClusterIP      10.0.131.170   <none>          5000/TCP         3m35s
+config                 LoadBalancer   10.0.49.222    51.143.107.33   8888:31212/TCP   6m28s
+gateway                LoadBalancer   10.0.208.189   40.91.122.33    80:32131/TCP     5m
+kubernetes             ClusterIP      10.0.0.1       <none>          443/TCP          48d
+notification-service   ClusterIP      10.0.60.69     <none>          8000/TCP         3m2s
+registry               LoadBalancer   10.0.122.108   52.143.74.122   8761:32475/TCP   5m31s
+statistics-service     ClusterIP      10.0.232.183   <none>          7000/TCP         3m17s
 
 
 # few additional commands
@@ -128,3 +138,13 @@ source init.sh
 # install code-less insights
 
 helm install ./helm-version.tgz -f values.yaml
+
+====
+
+bash-3.2$ helm install ./helm-v0.7.tgz -f values.yaml --generate-name
+NAME: helm-v0-1575305184
+LAST DEPLOYED: Mon Dec  2 08:46:25 2019
+NAMESPACE: default
+STATUS: deployed
+REVISION: 1
+TEST SUITE: None
