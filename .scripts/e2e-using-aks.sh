@@ -55,6 +55,69 @@ docker run -p 127.0.0.1:8888:8888 ${CONTAINER_REGISTRY}.azurecr.io/config
 # install kubectl
 # https://kubernetes.io/docs/tasks/tools/install-kubectl/
 
+cd kubernetes
+
+# deploy secrets
+envsubst < 0-secrets.yaml > deploy/0-secrets.yaml
+kubectl apply -f deploy/0-secrets.yaml
+
+# deploy config
+envsubst < 1-config.yaml > deploy/1-config.yaml
+kubectl apply -f deploy/1-config.yaml
+
+# deploy registry
+envsubst < 2-registry.yaml > deploy/2-registry.yaml
+kubectl apply -f deploy/2-registry.yaml
+
+# deploy gateway
+envsubst < 3-gateway.yaml  > deploy/3-gateway.yaml
+kubectl apply -f deploy/3-gateway.yaml
+
+# deploy auth-service
+envsubst < 4-auth-service.yaml > deploy/4-auth-service.yaml
+kubectl apply -f deploy/4-auth-service.yaml
+
+# deploy account-service
+envsubst < 5-account-service.yaml > deploy.5-account-service.yaml
+kubectl apply -f deploy/5-account-service.yaml
+
+# deploy statistics-service
+envsubst < 6-statistics-service.yaml > deploy/6-statistics-service.yaml
+kubeclt apply -f deploy/6-statistics-service.yaml
+
+# deploy notification-service
+envsubst < 7-notification-service.yaml > deploy/7-notification-service.yaml
+kubectl apply -f deploy/7-notification-service.yaml
+
+# look up
+bash-3.2$ kubectl get services
+NAME                   TYPE           CLUSTER-IP     EXTERNAL-IP      PORT(S)          AGE
+account-service        ClusterIP      10.0.114.121   <none>           6000/TCP         7m18s
+auth-service           ClusterIP      10.0.85.141    <none>           5000/TCP         9m12s
+config                 LoadBalancer   10.0.205.56    52.143.85.191    8888:31213/TCP   4h23m
+gateway                LoadBalancer   10.0.189.35    51.143.122.223   80:32508/TCP     12m
+kubernetes             ClusterIP      10.0.0.1       <none>           443/TCP          49d
+notification-service   ClusterIP      10.0.195.170   <none>           8000/TCP         3m58s
+registry               LoadBalancer   10.0.218.238   52.137.101.136   8761:30758/TCP   4h16m
+statistics-service     ClusterIP      10.0.179.87    <none>           7000/TCP         5m4s
+
+
+# few additional commands
+
+kubectl get pods
+kubectl get services
+kubectl get svc gateway
+kubectl delete pod [pod-name]
+kubectl delete deployment [deployment-name]
+kubectl delete service [service-name]
+kubectl get secret piggymetrics -o yaml
+
+http://.../actuator
+
+# https://codefresh.io/kubernetes-tutorial/kubernetes-cheat-sheet/
+
+# ========= old stuff =================
+
 # install kompose
 # https://kubernetes.io/docs/tasks/configure-pod-container/translate-compose-kubernetes/
 
@@ -75,28 +138,10 @@ kubectl apply -f statistics-service-service.yaml
 kubectl apply -f notification-service-deployment.yaml
 kubectl apply -f notification-service-service.yaml
 
-bash-3.2$ kubectl get services
-NAME                   TYPE           CLUSTER-IP     EXTERNAL-IP     PORT(S)          AGE
-account-service        ClusterIP      10.0.195.104   <none>          6000/TCP         4m13s
-auth-service           ClusterIP      10.0.131.170   <none>          5000/TCP         3m35s
-config                 LoadBalancer   10.0.49.222    51.143.107.33   8888:31212/TCP   6m28s
-gateway                LoadBalancer   10.0.208.189   40.91.122.33    80:32131/TCP     5m
-kubernetes             ClusterIP      10.0.0.1       <none>          443/TCP          48d
-notification-service   ClusterIP      10.0.60.69     <none>          8000/TCP         3m2s
-registry               LoadBalancer   10.0.122.108   52.143.74.122   8761:32475/TCP   5m31s
-statistics-service     ClusterIP      10.0.232.183   <none>          7000/TCP         3m17s
 
 
-# few additional commands
 
-kubectl get pods
-kubectl get services
-kubectl get svc gateway
-kubectl delete pod [pod-name]
 
-http://.../actuator
-
-# https://codefresh.io/kubernetes-tutorial/kubernetes-cheat-sheet/
 
 
 # Azure Monitor - Kusto Query
@@ -148,3 +193,4 @@ NAMESPACE: default
 STATUS: deployed
 REVISION: 1
 TEST SUITE: None
+
