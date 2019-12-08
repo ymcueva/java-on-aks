@@ -571,6 +571,7 @@ Azure Monitor, Log Analytics and Application Insights.
 
 - [Azure Kubernetes Story](https://docs.microsoft.com/en-us/azure/aks/)
 - [Azure Container Registry](https://docs.microsoft.com/en-us/azure/container-registry/)
+- [Production Ready and Supported Java Container Images](https://docs.microsoft.com/en-us/azure/java/jdk/java-jdk-docker-images)
 - [Kusto Query Language](https://docs.microsoft.com/en-us/azure/kusto/query/)
 - [`kubectl` Cheat Sheet 1](https://codefresh.io/kubernetes-tutorial/kubernetes-cheat-sheet/)
 - [`kubectl` Cheat Sheet 2](https://kubernetes.io/docs/reference/kubectl/cheatsheet/)
