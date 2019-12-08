@@ -578,9 +578,9 @@ to satisfy your deployments' business and technical requirements. See [Microserv
 - Frame a plan to assume infrastructure management -- including load balancers, clustering, 
 security, SSL offloading, domain name mapping, etc.
 - Frame a plan to assume service management -- including configuration, managing secrets, backup & restore, 
-monitoring & log shipping, upgrades, auto-restart, auto-scale, etc. If you are deploying 
+monitoring & log shipping, upgrades, auto-restart, auto-scale or manual-scale, etc. If you are deploying 
 Spring Cloud micro service apps, service management should include 
-strategies for dynamically scaling Spring Cloud middleware components - 
+strategies for manually or dynamically scaling Spring Cloud middleware components - 
 Spring Cloud Config Server,
 Spring Cloud Service Registry, Spring Cloud Gateway, etc.
 
