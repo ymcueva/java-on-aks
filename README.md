@@ -49,6 +49,7 @@ micro service architecture pattern using Spring Boot and Spring Cloud
 - Automate and rapidly deploy changes to Azure Kubernetes Service - using GitHub Actions or Azure Pipelines
 - Rapidly deploy changes to Azure Spring Cloud without disruption - blue-green deployments
 - Scale out Java apps in Azure Kubernetes Service
+- Learn about next steps to production
 
 ## What you will need
 
@@ -559,13 +560,29 @@ Selector:               app=gateway,project=piggymetrics,tier=frontend
 Replicas:               4 desired | 4 updated | 4 total | 4 available | 0 unavailable
 ```
 
-## Congratulations
+## Congratulations and Next Steps to Production
 
 Congratulations!! 
 
 You built, deployed, scaled out and setup monitoring for Spring Cloud micro service apps
 using Spring Boot and Spring Cloud, Azure Kubernetes Service, Azure Container Registry,
 Azure Monitor, Log Analytics and Application Insights.
+
+To advance Java deployments on Kubernetes to production, you should think 
+about the following next steps
+- Frame a scalable infrastructure with Azure Kubernetes Service and Azure Container Registry
+to satisfy your deployments' business and technical requirements. See [Microservices architecture on Azure Kubernetes Service (AKS)](https://docs.microsoft.com/en-us/azure/architecture/reference-architectures/microservices/aks)
+- Define an application lifecyle for apps on Azure Kubernetes Service and use them
+ across developer and DevOps automation tools. This lifecyle should include a 
+ source-to-container strategy
+- Frame a plan to assume infrastructure management, including load balancers, clustering, 
+security, SSL offloading, domain name mapping, etc.
+- Frame a plan to assume service management, configuration, managing secrets, backup & restore, 
+monitoring & log shipping, upgrades, auto-restart, auto-scale, etc. If you are deploying 
+Spring Cloud micro service apps, service management should include 
+strategies for dynamically scaling Spring Cloud middleware components - 
+Spring Cloud Config Server,
+Spring Cloud Service Registry, Spring Cloud Gateway, etc.
 
 ## Resources
 
