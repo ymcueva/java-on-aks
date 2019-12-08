@@ -376,7 +376,8 @@ You can attach debuggers to Spring Cloud micro service apps and step through the
 look at logs and metrics. Use Java Flight Recorder, etc.
 
 ### Stream logs from micro service apps in cloud to development machines
-Soon, you will be able to stream logs from an app to your development machine using `kubectl`, like:
+You can stream logs from micro service apps running on Kubernetes to your 
+development machine using `kubectl`, like:
 ```bash
 # Stream logs from Spring Cloud Config Server
 kubectl logs -f --timestamps=true -l app=config
@@ -524,6 +525,9 @@ Azure Monitor, Log Analytics and Application Insights.
 - [Azure Kubernetes Story](https://docs.microsoft.com/en-us/azure/aks/)
 - [Azure Container Registry](https://docs.microsoft.com/en-us/azure/container-registry/)
 - [Kusto Query Language](https://docs.microsoft.com/en-us/azure/kusto/query/)
+- [`kubectl` Cheat Sheet 1](https://codefresh.io/kubernetes-tutorial/kubernetes-cheat-sheet/)
+- [`kubectl` Cheat Sheet 2](https://kubernetes.io/docs/reference/kubectl/cheatsheet/)
+- [Debugging Applications in Kubernetes Cluster](https://kubernetes.io/docs/tasks/debug-application-cluster/)
 - [Triage Micro Service Applications using Application Map](https://docs.microsoft.com/en-us/azure/azure-monitor/app/app-map)
 - [Azure for Java Cloud Developers](https://docs.microsoft.com/en-us/azure/java/)
 - [Spring Cloud Azure](https://cloud.spring.io/spring-cloud-azure/)
