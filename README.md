@@ -327,6 +327,14 @@ registry               LoadBalancer   10.0.198.13    52.137.96.211   8761:31689/
 statistics-service     ClusterIP      10.0.217.229   <none>          7000/TCP         76s
 ```
 
+You can also validate that by 
+opening the Service Registry Dashboard
+
+```bash
+open http://<EXTERNAL-IP-of-registry>:8761/
+```
+![](./media/spring-cloud-service-registry-running-in-kubernetes-02.jpg)
+
 ### Open the Spring Cloud micro service apps on Kubernetes
 
 Open the Piggymetrics landing page by using the`gateway' app's `EXTERNAL-IP`.
