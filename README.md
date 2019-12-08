@@ -200,7 +200,8 @@ using Maven and [Jib](https://github.com/GoogleContainerTools/jib/tree/master/ji
  
 ```bash
 cd config
-mvn compile jib:build -Djib.container.environment=CONFIG_SERVICE_PASSWORD=${CONFIG_SERVICE_PASSWORD}
+mvn compile jib:build \
+    -Djib.container.environment=CONFIG_SERVICE_PASSWORD=${CONFIG_SERVICE_PASSWORD}
 
 cd ../registry
 mvn compile jib:build
@@ -212,13 +213,16 @@ cd ../auth-service
 mvn compile jib:build
 
 cd ../account-service
-mvn compile jib:build -Djib.container.environment=ACCOUNT_SERVICE_PASSWORD=${ACCOUNT_SERVICE_PASSWORD}
+mvn compile jib:build \
+    -Djib.container.environment=ACCOUNT_SERVICE_PASSWORD=${ACCOUNT_SERVICE_PASSWORD}
 
 cd ../statistics-service
-mvn compile jib:build -Djib.container.environment=STATISTICS_SERVICE_PASSWORD=${STATISTICS_SERVICE_PASSWORD}
+mvn compile jib:build \
+    -Djib.container.environment=STATISTICS_SERVICE_PASSWORD=${STATISTICS_SERVICE_PASSWORD}
 
 cd ../notification-service
-mvn compile jib:build -Djib.container.environment=NOTIFICATION_SERVICE_PASSWORD=${NOTIFICATION_SERVICE_PASSWORD}
+mvn compile jib:build \
+    -Djib.container.environment=NOTIFICATION_SERVICE_PASSWORD=${NOTIFICATION_SERVICE_PASSWORD}
 
 ```
 ### Prepare Kubernetes manifest files
