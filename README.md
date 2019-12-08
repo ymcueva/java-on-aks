@@ -10,12 +10,12 @@ urlFragment: "java-on-aks"
 
 # End-to-end experience - Java on AKS
 
-This guide walks you through how to deploy and manage Java apps on Azure Kubernetes Service.
+This guide walks you through how to deploy and manage Java apps on the Azure Kubernetes Service.
 
 <!--
 
 ## Editor's checklist
-- What will you experience
+- What will you experience (DONE)
 - What you will need
 - Start here
 - Build Piggymetrics - Spring Cloud micro service apps
@@ -24,9 +24,9 @@ This guide walks you through how to deploy and manage Java apps on Azure Kuberne
 - Create Azure Kubernetes Service and Azure Container Registry
 - Deploy Piggymetrics to Azure Kubernetes Service
 - Troubleshooting Java apps in Azure Kubernetes Service
-- Automate and rapidly deploy changes to Azure Kubernetes Service - GitHub Actions or Azure Pipelines
+- Automate and rapidly deploy changes to Azure Kubernetes Service - using GitHub Actions or Azure Pipelines
 - Rapidly deploy changes to Azure Spring Cloud without disruption - blue-green deployments
-- Scale up Java apps in Azure Kubernetes Service
+- Scale out Java apps in Azure Kubernetes Service
 - Congratulations!
 - Resources
 
@@ -45,9 +45,9 @@ micro service architecture pattern using Spring Boot and Spring Cloud
 - Create Azure Kubernetes Service and Azure Container Registry
 - Deploy Piggymetrics to Azure Kubernetes Service
 - Troubleshoot Java apps in Azure Kubernetes Service
-- Automate and rapidly deploy changes to Azure Kubernetes Service - GitHub Actions or Azure Pipelines
+- Automate and rapidly deploy changes to Azure Kubernetes Service - using GitHub Actions or Azure Pipelines
 - Rapidly deploy changes to Azure Spring Cloud without disruption - blue-green deployments
-- Scale up Java apps in Azure Kubernetes Service
+- Scale out Java apps in Azure Kubernetes Service
 
 ## What you will need
 
@@ -69,10 +69,11 @@ In addition, you will need the following:
 | [Kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
 | [Helm](https://helm.sh/docs/intro/install/)
 | [dos2unix](https://brewinstall.org/install-dos2unix-on-mac-with-brew/)
+|
 
 ## IMPORTANT - Start Here
 
-Clone this GitHub repo and prep:
+Clone this GitHub repo and change directory:
 ```bash
 git clone https://github.com/Azure-Samples/java-on-aks.git
 
@@ -89,7 +90,7 @@ and capture MongoDB and RabbitMQ coordinates and credentials in
 
 ### Create Azure Container Registry
 If you have not yet setup the development environment, 
-make your own copy of the setup environment variables bash script:
+make a copy of the setup environment variables bash script:
 ```bash
 cp .scripts/setup-env-variables-azure-template.sh .scripts/setup-env-variables-azure.sh
 ```
@@ -147,7 +148,7 @@ az acr login -n ${CONTAINER_REGISTRY}
 
 ### Create Azure Kubernetes Service
 
-Create an Azure Kubernetes Service instance and attach Azure Container Registry using Azure CLI:
+Create an Azure Kubernetes Service instance and attach the Azure Container Registry using Azure CLI:
 ```bash
 az aks create --name ${AKS_CLUSTER} \
     --resource-group ${RESOURCE_GROUP} \
@@ -169,7 +170,7 @@ If you do not have an instance of Application Insights, see
  [how to create Application Insights](./docs/create-application-insights.md).
 
 Download Java agent ([download link](https://github.com/microsoft/Application-Insights-K8s-Codeless-Attach/releases))
-for auto instrumenting for monitoring Java apps on Azure Kubernetes Service.
+for auto instrumenting for monitoring Java apps on an Azure Kubernetes Service.
 
 From a Linux or MacOS terminal, execute init.sh from the release.
 
@@ -178,7 +179,7 @@ source init.sh
 ```
 
 Open the generated `values.yaml` file in an editor and fill up Kubernetes Cluster
- target namespace `default` and Application Insights `Instrumentation Key`. Like this:
+ target namespace, say `default`, and Application Insights `Instrumentation Key`. Like this:
  
 ```yaml
 namespaces: 
@@ -237,7 +238,7 @@ source ../.scripts/prepare-kubernetes-manifest-files.sh
 ```
 ### Create Secrets in Kubernetes
 
-You can create Secrets in Kubernetes:
+You can create Secrets for deploying micro service apps in Kubernetes:
 ```bash
 kubectl apply -f deploy/0-secrets.yaml
 
@@ -307,7 +308,7 @@ open http://<EXTERNAL-IP-of-registry>:8761/
 
 ### Deploy Spring Cloud Gateway
 
-You can deploy the Spring Cloud Service Registry to Kubernetes:
+You can deploy the Spring Cloud Gateway to Kubernetes:
 ```bash
 kubectl apply -f deploy/3-gateway.yaml
 ```
@@ -339,16 +340,16 @@ statistics-service     ClusterIP      10.0.217.229   <none>          7000/TCP   
 ```
 
 You can also validate that by 
-opening the Service Registry Dashboard
+opening the Spring Cloud Service Registry Dashboard
 
 ```bash
 open http://<EXTERNAL-IP-of-registry>:8761/
 ```
 ![](./media/spring-cloud-service-registry-running-in-kubernetes-02.jpg)
 
-### Open the Spring Cloud micro service apps on Kubernetes
+### Open Spring Cloud micro service apps running on Kubernetes
 
-Open the Piggymetrics landing page by using the`gateway' app's `EXTERNAL-IP`.
+Open the Piggymetrics landing page by using the`gateway` app's `EXTERNAL-IP`.
 
 ```bash
 open http://<EXTERNAL-IP-of-gateway>/
@@ -411,13 +412,15 @@ on the `Logs` blade in the Azure Portal and choosing your Log Analytics Workspac
 ![](./media/onboard-kubernetes-cluster-to-azure-monitor.jpg)
 
 
-You can then view logs using Kusto queires in the logs blade of your Azure Spring Cloud instance:
+Then, you can view logs using Kusto queries in the `Logs` blade of your 
+Log Analytics Workspace:
 ![](./media/view-logs-in-log-analytics-workspace.jpg)
 
 Here are some sample Kusto queries for viewing logs for each of the micro service apps -
 please replace `java-on-aks` with your Azure Kubernetes cluster name:
 
 ```sql
+-- Logs for Spring Cloud Config Server
 let ContainerIdList = KubePodInventory
 | where ContainerName contains 'config'
 | where ClusterId contains 'java-on-aks'
@@ -429,6 +432,8 @@ ContainerLog
 | order by TimeGenerated desc
 | render table
 
+
+-- Logs for Spring Cloud Service Registry
 let ContainerIdList = KubePodInventory
 | where ContainerName contains 'registry'
 | where ClusterId contains 'java-on-aks'
@@ -440,6 +445,8 @@ ContainerLog
 | order by TimeGenerated desc
 | render table
 
+
+-- Logs for Spring Cloud Gateway
 let ContainerIdList = KubePodInventory
 | where ContainerName contains 'gateway'
 | where ClusterId contains 'java-on-aks'
@@ -451,6 +458,8 @@ ContainerLog
 | order by TimeGenerated desc
 | render table
 
+
+-- Logs for Account Service micro service app
 let ContainerIdList = KubePodInventory
 | where ContainerName contains 'account-service'
 | where ClusterId contains 'java-on-aks'
@@ -462,6 +471,8 @@ ContainerLog
 | order by TimeGenerated desc
 | render table
 
+
+-- Logs for Auth Service micro service app
 let ContainerIdList = KubePodInventory
 | where ContainerName contains 'auth-service'
 | where ClusterId contains 'java-on-aks'
@@ -481,11 +492,11 @@ automatically detect performance anomalies. It includes powerful analytics tools
 help you diagnose issues and to understand what users actually do with your app. It is designed to 
 help you continuously improve performance and usability.
 
-Allow some time, then you can see distributed tracing in the 
+After some time, you can see distributed tracing in the 
 configured Application Insights instance. Go to the `Application Map' blade in the Azure Portal:
 ![](./media/distributed-tracing.jpg)
 
-You can also view the performance and call drill downs in the App Insights view:
+Also, you can view the performance and call drill downs in the `Performance` blade:
 ![](./media/view-performance-in-app-insights.jpg)
 
 ## Automate and rapidly deploy changes to Azure Kubernetes Service - GitHub Actions or Azure Pipelines
