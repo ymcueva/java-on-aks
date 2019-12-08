@@ -78,7 +78,7 @@ envsubst < 4-auth-service.yaml > deploy/4-auth-service.yaml
 kubectl apply -f deploy/4-auth-service.yaml
 
 # deploy account-service
-envsubst < 5-account-service.yaml > deploy.5-account-service.yaml
+envsubst < 5-account-service.yaml > deploy/5-account-service.yaml
 kubectl apply -f deploy/5-account-service.yaml
 
 # deploy statistics-service

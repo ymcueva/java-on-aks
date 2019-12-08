@@ -17,3 +17,7 @@ target/
 
 # K8S generated files
 kubernetes/deploy/
+piggymetrics/
+
+# Scripts
+.scripts/

@@ -1,276 +1,516 @@
-[![Build Status](https://travis-ci.org/sqshq/PiggyMetrics.svg?branch=master)](https://travis-ci.org/sqshq/PiggyMetrics)
-[![codecov.io](https://codecov.io/github/sqshq/PiggyMetrics/coverage.svg?branch=master)](https://codecov.io/github/sqshq/PiggyMetrics?branch=master)
-[![GitHub license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/sqshq/PiggyMetrics/blob/master/LICENCE)
-[![Join the chat at https://gitter.im/sqshq/PiggyMetrics](https://badges.gitter.im/sqshq/PiggyMetrics.svg)](https://gitter.im/sqshq/PiggyMetrics?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+---
+page_type: sample
+languages:
+- java
+products:
+- Azure Kubernetes Service
+description: "End-to-end experience for Java apps in Azure Kubernetes Service (AKS)"
+urlFragment: "java-on-aks"
+---
 
-# Piggy Metrics
+# End-to-end experience - Java on AKS
 
-**A simple way to deal with personal finances**
+This guide walks you through how to deploy and manage Java apps on Azure Kubernetes Service.
 
-This is a [proof-of-concept application](https://piggymetrics.tk), which demonstrates [Microservice Architecture Pattern](http://martinfowler.com/microservices/) using Spring Boot, Spring Cloud and Docker.
-With a pretty neat user interface, by the way.
+<!--
 
-![](https://cloud.githubusercontent.com/assets/6069066/13864234/442d6faa-ecb9-11e5-9929-34a9539acde0.png)
-![Piggy Metrics](https://cloud.githubusercontent.com/assets/6069066/13830155/572e7552-ebe4-11e5-918f-637a49dff9a2.gif)
+## Editor's checklist
+- What will you experience
+- What you will need
+- Start here
+- Build Piggymetrics - Spring Cloud micro service apps
+- Create Mongodb and RabbitMQ
+- Run Piggymetrics locally 
+- Create Azure Kubernetes Service and Azure Container Registry
+- Deploy Piggymetrics to Azure Kubernetes Service
+- Troubleshooting Java apps in Azure Kubernetes Service
+- Automate and rapidly deploy changes to Azure Kubernetes Service - GitHub Actions or Azure Pipelines
+- Rapidly deploy changes to Azure Spring Cloud without disruption - blue-green deployments
+- Scale up Java apps in Azure Kubernetes Service
+- Congratulations!
+- Resources
 
-## Functional services
+-->
+![](./media/azure-spring-cloud-large.png)
+![](./media/java.jpeg) ![](./media/kubernetes.png) ![](./media/aks-logo.png) ![](./media/acr.png) ![](./media/docker.png) ![](./media/helm.png)
 
-PiggyMetrics was decomposed into three core microservices. All of them are independently deployable applications, organized around certain business domains.
+## What will you experience
 
-<img width="880" alt="Functional services" src="https://cloud.githubusercontent.com/assets/6069066/13900465/730f2922-ee20-11e5-8df0-e7b51c668847.png">
+You will:
+- Build Piggymetrics - build a proof-of-concept application, which demonstrates 
+micro service architecture pattern using Spring Boot and Spring Cloud
+- Create Mongodb and RabbitMQ on Azure
+- Create Azure Kubernetes Service and Azure Container Registry
+- Deploy Piggymetrics to Azure Kubernetes Service
+- Troubleshoot Java apps in Azure Kubernetes Service
+- Automate and rapidly deploy changes to Azure Kubernetes Service - GitHub Actions or Azure Pipelines
+- Rapidly deploy changes to Azure Spring Cloud without disruption - blue-green deployments
+- Scale up Java apps in Azure Kubernetes Service
 
-#### Account service
-Contains general user input logic and validation: incomes/expenses items, savings and account settings.
+## What you will need
 
-Method	| Path	| Description	| User authenticated	| Available from UI
-------------- | ------------------------- | ------------- |:-------------:|:----------------:|
-GET	| /accounts/{account}	| Get specified account data	|  | 	
-GET	| /accounts/current	| Get current account data	| × | ×
-GET	| /accounts/demo	| Get demo account data (pre-filled incomes/expenses items, etc)	|   | 	×
-PUT	| /accounts/current	| Save current account data	| × | ×
-POST	| /accounts/	| Register new account	|   | ×
+In order to deploy a Java Web app to cloud, you need 
+an Azure subscription. If you do not already have an Azure 
+subscription, you can activate your 
+[MSDN subscriber benefits](https://azure.microsoft.com/pricing/member-offers/msdn-benefits-details/) 
+or sign up for a 
+[free Azure account]((https://azure.microsoft.com/pricing/free-trial/)).
 
+In addition, you will need the following:
 
-#### Statistics service
-Performs calculations on major statistics parameters and captures time series for each account. Datapoint contains values, normalized to base currency and time period. This data is used to track cash flow dynamics in account lifetime.
+| [Azure CLI](http://docs.microsoft.com/cli/azure/overview) 
+| [Java 8](https://www.azul.com/downloads/azure-only/zulu) 
+| [Maven 3](http://maven.apache.org/) 
+| [Git](https://github.com/) 
+| [ACR Docker Credential Helper](https://github.com/Azure/acr-docker-credential-helper)
+| [Docker](https://docs.docker.com/v17.09/engine/installation/)
+| [Kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
+| [Helm](https://helm.sh/docs/intro/install/)
+| [dos2unix](https://brewinstall.org/install-dos2unix-on-mac-with-brew/)
 
-Method	| Path	| Description	| User authenticated	| Available from UI
-------------- | ------------------------- | ------------- |:-------------:|:----------------:|
-GET	| /statistics/{account}	| Get specified account statistics	          |  | 	
-GET	| /statistics/current	| Get current account statistics	| × | × 
-GET	| /statistics/demo	| Get demo account statistics	|   | × 
-PUT	| /statistics/{account}	| Create or update time series datapoint for specified account	|   | 
+## IMPORTANT - Start Here
 
+Clone this GitHub repo and prep:
+```bash
+git clone https://github.com/Azure-Samples/java-on-aks.git
 
-#### Notification service
-Stores users contact information and notification settings (like remind and backup frequency). Scheduled worker collects required information from other services and sends e-mail messages to subscribed customers.
-
-Method	| Path	| Description	| User authenticated	| Available from UI
-------------- | ------------------------- | ------------- |:-------------:|:----------------:|
-GET	| /notifications/settings/current	| Get current account notification settings	| × | ×	
-PUT	| /notifications/settings/current	| Save current account notification settings	| × | ×
-
-#### Notes
-- Each microservice has its own database, so there is no way to bypass API and access persistance data directly.
-- In this project, I use MongoDB as a primary database for each service. It might also make sense to have a polyglot persistence architecture (сhoose the type of db that is best suited to service requirements).
-- Service-to-service communication is quite simplified: microservices talking using only synchronous REST API. Common practice in a real-world systems is to use combination of interaction styles. For example, perform synchronous GET request to retrieve data and use asynchronous approach via Message broker for create/update operations in order to decouple services and buffer messages. However, this brings us to the [eventual consistency](http://martinfowler.com/articles/microservice-trade-offs.html#consistency) world.
-
-## Infrastructure services
-There's a bunch of common patterns in distributed systems, which could help us to make described core services work. [Spring cloud](http://projects.spring.io/spring-cloud/) provides powerful tools that enhance Spring Boot applications behaviour to implement those patterns. I'll cover them briefly.
-<img width="880" alt="Infrastructure services" src="https://cloud.githubusercontent.com/assets/6069066/13906840/365c0d94-eefa-11e5-90ad-9d74804ca412.png">
-### Config service
-[Spring Cloud Config](http://cloud.spring.io/spring-cloud-config/spring-cloud-config.html) is horizontally scalable centralized configuration service for distributed systems. It uses a pluggable repository layer that currently supports local storage, Git, and Subversion. 
-
-In this project, I use `native profile`, which simply loads config files from the local classpath. You can see `shared` directory in [Config service resources](https://github.com/sqshq/PiggyMetrics/tree/master/config/src/main/resources). Now, when Notification-service requests its configuration, Config service responses with `shared/notification-service.yml` and `shared/application.yml` (which is shared between all client applications).
-
-##### Client side usage
-Just build Spring Boot application with `spring-cloud-starter-config` dependency, autoconfiguration will do the rest.
-
-Now you don't need any embedded properties in your application. Just provide `bootstrap.yml` with application name and Config service url:
-```yml
-spring:
-  application:
-    name: notification-service
-  cloud:
-    config:
-      uri: http://config:8888
-      fail-fast: true
+cd java-on-aks
 ```
 
-##### With Spring Cloud Config, you can change app configuration dynamically. 
-For example, [EmailService bean](https://github.com/sqshq/PiggyMetrics/blob/master/notification-service/src/main/java/com/piggymetrics/notification/service/EmailServiceImpl.java) was annotated with `@RefreshScope`. That means, you can change e-mail text and subject without rebuild and restart Notification service application.
+## Create MongoDB and RabbitMQ
 
-First, change required properties in Config server. Then, perform refresh request to Notification service:
-`curl -H "Authorization: Bearer #token#" -XPOST http://127.0.0.1:8000/notifications/refresh`
+You can create MongoDB and RabbitMQ on Azure by following steps outlined [here](./docs/create-mongodb-and-rabbitmq.md)
+and capture MongoDB and RabbitMQ coordinates and credentials in 
+`setup-env-variables-development.sh` 
+and `setup-env-variables-azure.sh`. 
 
-Also, you could use Repository [webhooks to automate this process](http://cloud.spring.io/spring-cloud-config/spring-cloud-config.html#_push_notifications_and_spring_cloud_bus)
+## Create Azure Container Registry and Azure Kubernetes Service
 
-##### Notes
-- There are some limitations for dynamic refresh though. `@RefreshScope` doesn't work with `@Configuration` classes and doesn't affect `@Scheduled` methods
-- `fail-fast` property means that Spring Boot application will fail startup immediately, if it cannot connect to the Config Service.
-- There are significant [security notes](https://github.com/sqshq/PiggyMetrics#security) below
+### Create Azure Container Registry
 
-### Auth service
-Authorization responsibilities are completely extracted to separate server, which grants [OAuth2 tokens](https://tools.ietf.org/html/rfc6749) for the backend resource services. Auth Server is used for user authorization as well as for secure machine-to-machine communication inside a perimeter.
+Prep the dev environment by populating environment variables in 
+`.scripts/setup-env-variables-azure.sh`
+bash script:
 
-In this project, I use [`Password credentials`](https://tools.ietf.org/html/rfc6749#section-4.3) grant type for users authorization (since it's used only by native PiggyMetrics UI) and [`Client Credentials`](https://tools.ietf.org/html/rfc6749#section-4.4) grant for microservices authorization.
+```bash
+# ====== Piggy Metrics Azure Coordinates
+export RESOURCE_GROUP=INSERT-your-resource-group-name
+export REGION=westus2
+export AKS_CLUSTER=INSERT-your-AKS-cluster-name
+export CONTAINER_REGISTRY=INSERT-your-Azure-Container-Registry-name
 
-Spring Cloud Security provides convenient annotations and autoconfiguration to make this really easy to implement from both server and client side. You can learn more about it in [documentation](http://cloud.spring.io/spring-cloud-security/spring-cloud-security.html) and check configuration details in [Auth Server code](https://github.com/sqshq/PiggyMetrics/tree/master/auth-service/src/main/java/com/piggymetrics/auth).
+## ===== Mongo DB
+export MONGODB_DATABASE=INSERT-your-mongodb-database-name
+export MONGODB_USER=INSERT-your-cosmosdb-account-name
+export MONGODB_URI="INSERT-your-mongodb-connection-string"
+export MONGODB_RESOURCE_ID=INSERT-your-mongodb-resource-id
 
-From the client side, everything works exactly the same as with traditional session-based authorization. You can retrieve `Principal` object from request, check user's roles and other stuff with expression-based access control and `@PreAuthorize` annotation.
+## ===== Rabbit MQ
+export RABBITMQ_RESOURCE_GROUP=INSERT-your-rabbitmq-resource-group-name
+export RABBITMQ_VM_NAME=INSERT-your-rabbitmq-virtual-machine-name
+export RABBITMQ_ADMIN_USERNAME=INSERT-your-rabbitmq-admin-user-name
 
-Each client in PiggyMetrics (account-service, statistics-service, notification-service and browser) has a scope: `server` for backend services, and `ui` - for the browser. So we can also protect controllers from external access, for example:
-
-``` java
-@PreAuthorize("#oauth2.hasScope('server')")
-@RequestMapping(value = "accounts/{name}", method = RequestMethod.GET)
-public List<DataPoint> getStatisticsByAccountName(@PathVariable String name) {
-	return statisticsService.findByAccountName(name);
-}
+# Rabbit MQ
+export RABBITMQ_HOST=INSERT-your-rabbitmq-host-public-ip-address
+export RABBITMQ_PORT=5672
+export RABBITMQ_USERNAME=INSERT-your-rabbitmq-username
+export RABBITMQ_PASSWORD=INSERT-your-rabbitmq-password
 ```
 
-### API Gateway
-As you can see, there are three core services, which expose external API to client. In a real-world systems, this number can grow very quickly as well as whole system complexity. Actually, hundreds of services might be involved in rendering of one complex webpage.
+Then, export these environment variables from the `java-on-aks` directory:
 
-In theory, a client could make requests to each of the microservices directly. But obviously, there are challenges and limitations with this option, like necessity to know all endpoints addresses, perform http request for each piece of information separately, merge the result on a client side. Another problem is non web-friendly protocols which might be used on the backend.
+```bash
+source .scripts/setup-env-variables-azure.sh
+```
 
-Usually a much better approach is to use API Gateway. It is a single entry point into the system, used to handle requests by routing them to the appropriate backend service or by invoking multiple backend services and [aggregating the results](http://techblog.netflix.com/2013/01/optimizing-netflix-api.html). Also, it can be used for authentication, insights, stress and canary testing, service migration, static response handling, active traffic management.
-
-Netflix opensourced [such an edge service](http://techblog.netflix.com/2013/06/announcing-zuul-edge-service-in-cloud.html), and now with Spring Cloud we can enable it with one `@EnableZuulProxy` annotation. In this project, I use Zuul to store static content (ui application) and to route requests to appropriate microservices. Here's a simple prefix-based routing configuration for Notification service:
-
-```yml
-zuul:
-  routes:
-    notification-service:
-        path: /notifications/**
-        serviceId: notification-service
-        stripPrefix: false
+Create an Azure Container Registry instance using Azure CLI:
+```bash
+# Create a Resource Group, if you have not created one
+az group create --name ${RESOURCE_GROUP} \
+    --location ${REGION}
+    
+# Create Azure Container Registry
+az acr create --name ${CONTAINER_REGISTRY} \
+    --resource-group ${RESOURCE_GROUP} \
+    --sku basic --location ${REGION}
+    
+# Log into Azure Container Registry
+az acr login -n ${CONTAINER_REGISTRY}
 
 ```
 
-That means all requests starting with `/notifications` will be routed to Notification service. There is no hardcoded address, as you can see. Zuul uses [Service discovery](https://github.com/sqshq/PiggyMetrics/blob/master/README.md#service-discovery) mechanism to locate Notification service instances and also [Circuit Breaker and Load Balancer](https://github.com/sqshq/PiggyMetrics/blob/master/README.md#http-client-load-balancer-and-circuit-breaker), described below.
+### Create Azure Kubernetes Service
 
-### Service discovery
-
-Another commonly known architecture pattern is Service discovery. It allows automatic detection of network locations for service instances, which could have dynamically assigned addresses because of auto-scaling, failures and upgrades.
-
-The key part of Service discovery is Registry. I use Netflix Eureka in this project. Eureka is a good example of the client-side discovery pattern, when client is responsible for determining locations of available service instances (using Registry server) and load balancing requests across them.
-
-With Spring Boot, you can easily build Eureka Registry with `spring-cloud-starter-eureka-server` dependency, `@EnableEurekaServer` annotation and simple configuration properties.
-
-Client support enabled with `@EnableDiscoveryClient` annotation an `bootstrap.yml` with application name:
-``` yml
-spring:
-  application:
-    name: notification-service
+Create an Azure Kubernetes Service instance and attach Azure Container Registry using Azure CLI:
+```bash
+az aks create --name ${AKS_CLUSTER} \
+    --resource-group ${RESOURCE_GROUP} \
+    --location ${REGION} \
+    --attach-acr ${CONTAINER_REGISTRY} \
+    --node-vm-size Standard_DS3_v2 \
+    --node-count 5
 ```
 
-Now, on application startup, it will register with Eureka Server and provide meta-data, such as host and port, health indicator URL, home page etc. Eureka receives heartbeat messages from each instance belonging to a service. If the heartbeat fails over a configurable timetable, the instance will be removed from the registry.
-
-Also, Eureka provides a simple interface, where you can track running services and a number of available instances: `http://localhost:8761`
-
-### Load balancer, Circuit breaker and Http client
-
-Netflix OSS provides another great set of tools. 
-
-#### Ribbon
-Ribbon is a client side load balancer which gives you a lot of control over the behaviour of HTTP and TCP clients. Compared to a traditional load balancer, there is no need in additional hop for every over-the-wire invocation - you can contact desired service directly.
-
-Out of the box, it natively integrates with Spring Cloud and Service Discovery. [Eureka Client](https://github.com/sqshq/PiggyMetrics#service-discovery) provides a dynamic list of available servers so Ribbon could balance between them.
-
-#### Hystrix
-Hystrix is the implementation of [Circuit Breaker pattern](http://martinfowler.com/bliki/CircuitBreaker.html), which gives a control over latency and failure from dependencies accessed over the network. The main idea is to stop cascading failures in a distributed environment with a large number of microservices. That helps to fail fast and recover as soon as possible - important aspects of fault-tolerant systems that self-heal.
-
-Besides circuit breaker control, with Hystrix you can add a fallback method that will be called to obtain a default value in case the main command fails.
-
-Moreover, Hystrix generates metrics on execution outcomes and latency for each command, that we can use to [monitor system behavior](https://github.com/sqshq/PiggyMetrics#monitor-dashboard).
-
-#### Feign
-Feign is a declarative Http client, which seamlessly integrates with Ribbon and Hystrix. Actually, with one `spring-cloud-starter-feign` dependency and `@EnableFeignClients` annotation you have a full set of Load balancer, Circuit breaker and Http client with sensible ready-to-go default configuration.
-
-Here is an example from Account Service:
-
-``` java
-@FeignClient(name = "statistics-service")
-public interface StatisticsServiceClient {
-
-	@RequestMapping(method = RequestMethod.PUT, value = "/statistics/{accountName}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	void updateStatistics(@PathVariable("accountName") String accountName, Account account);
-
-}
+Get access credentials for the AKS cluster:
+```bash
+az aks get-credentials --name ${AKS_CLUSTER} \
+    --resource-group ${RESOURCE_GROUP}
 ```
 
-- Everything you need is just an interface
-- You can share `@RequestMapping` part between Spring MVC controller and Feign methods
-- Above example specifies just desired service id - `statistics-service`, thanks to autodiscovery through Eureka (but obviously you can access any resource with a specific url)
+### Auto instrument for monitoring Java apps on Azure Kubernetes Service
 
-### Monitor dashboard
+Download Java agent ([download link](https://github.com/microsoft/Application-Insights-K8s-Codeless-Attach/releases))
+for auto instrumenting for monitoring Java apps on Azure Kubernetes Service.
 
-In this project configuration, each microservice with Hystrix on board pushes metrics to Turbine via Spring Cloud Bus (with AMQP broker). The Monitoring project is just a small Spring boot application with [Turbine](https://github.com/Netflix/Turbine) and [Hystrix Dashboard](https://github.com/Netflix-Skunkworks/hystrix-dashboard).
+From a Linux or MacOS terminal, execute init.sh from the release.
 
-See below [how to get it up and running](https://github.com/sqshq/PiggyMetrics#how-to-run-all-the-things).
-
-Let's see our system behavior under load: Account service calls Statistics service and it responses with a vary imitation delay. Response timeout threshold is set to 1 second.
-
-<img width="880" src="https://cloud.githubusercontent.com/assets/6069066/14194375/d9a2dd80-f7be-11e5-8bcc-9a2fce753cfe.png">
-
-<img width="212" src="https://cloud.githubusercontent.com/assets/6069066/14127349/21e90026-f628-11e5-83f1-60108cb33490.gif">	| <img width="212" src="https://cloud.githubusercontent.com/assets/6069066/14127348/21e6ed40-f628-11e5-9fa4-ed527bf35129.gif"> | <img width="212" src="https://cloud.githubusercontent.com/assets/6069066/14127346/21b9aaa6-f628-11e5-9bba-aaccab60fd69.gif"> | <img width="212" src="https://cloud.githubusercontent.com/assets/6069066/14127350/21eafe1c-f628-11e5-8ccd-a6b6873c046a.gif">
---- |--- |--- |--- |
-| `0 ms delay` | `500 ms delay` | `800 ms delay` | `1100 ms delay`
-| Well behaving system. The throughput is about 22 requests/second. Small number of active threads in Statistics service. The median service time is about 50 ms. | The number of active threads is growing. We can see purple number of thread-pool rejections and therefore about 30-40% of errors, but circuit is still closed. | Half-open state: the ratio of failed commands is more than 50%, the circuit breaker kicks in. After sleep window amount of time, the next request is let through. | 100 percent of the requests fail. The circuit is now permanently open. Retry after sleep time won't close circuit again, because the single request is too slow.
-
-### Log analysis
-
-Centralized logging can be very useful when attempting to identify problems in a distributed environment. Elasticsearch, Logstash and Kibana stack lets you search and analyze your logs, utilization and network activity data with ease.
-Ready-to-go Docker configuration described [in my other project](http://github.com/sqshq/ELK-docker).
-
-### Distributed tracing
-
-Analyzing problems in distributed systems can be difficult, for example, tracing requests that propagate from one microservice to another. It can be quite a challenge to try to find out how a request travels through the system, especially if you don't have any insight into the implementation of a microservice. Even when there is logging, it is hard to tell which action correlates to a single request.
-
-[Spring Cloud Sleuth](https://cloud.spring.io/spring-cloud-sleuth/) solves this problem by providing support for distributed tracing. It adds two types of IDs to the logging: traceId and spanId. The spanId represents a basic unit of work, for example sending an HTTP request. The traceId contains a set of spans forming a tree-like structure. For example, with a distributed big-data store, a trace might be formed by a PUT request. Using traceId and spanId for each operation we know when and where our application is as it processes a request, making reading our logs much easier. 
-
-The logs are as follows, notice the `[appname,traceId,spanId,exportable]` entries from the Slf4J MDC:
-
-```text
-2018-07-26 23:13:49.381  WARN [gateway,3216d0de1384bb4f,3216d0de1384bb4f,false] 2999 --- [nio-4000-exec-1] o.s.c.n.z.f.r.s.AbstractRibbonCommand    : The Hystrix timeout of 20000ms for the command account-service is set lower than the combination of the Ribbon read and connect timeout, 80000ms.
-2018-07-26 23:13:49.562  INFO [account-service,3216d0de1384bb4f,404ff09c5cf91d2e,false] 3079 --- [nio-6000-exec-1] c.p.account.service.AccountServiceImpl   : new account has been created: test
+```bash
+source init.sh
 ```
 
-- *`appname`*: The name of the application that logged the span from the property `spring.application.name`
-- *`traceId`*: This is an ID that is assigned to a single request, job, or action
-- *`spanId`*: The ID of a specific operation that took place
-- *`exportable`*: Whether the log should be exported to [Zipkin](https://zipkin.io/)
+Open the generated `values.yaml` file in an editor and fill up Kubernetes Cluster
+ target namespace `default` and Application Insights `Instrumentation Key`. Like this:
+ 
+```yaml
+namespaces: 
+  - target : "default" # kubernetes namespace where the Java apps will be auto-instrumented
+    iKey: "c197cf6b-WWWW-XXXX-YYYY-ZZZZZZZZZZZZ" # Instrumentation Key of the receiving Application Insights resource
+```
 
-## Security
+Install the Java agent for auto instrumentation:
+```bash
+helm install ./helm-<version>.tgz -f values.yaml --generate-name
+```
 
-An advanced security configuration is beyond the scope of this proof-of-concept project. For a more realistic simulation of a real system, consider to use https, JCE keystore to encrypt Microservices passwords and Config server properties content (see [documentation](http://cloud.spring.io/spring-cloud-config/spring-cloud-config.html#_security) for details).
+## Deploy Piggymetrics to Azure Kubernetes Service
 
-## Infrastructure automation
+### Build and push container images for micro service apps
 
-Deploying microservices, with their interdependence, is much more complex process than deploying monolithic application. It is important to have fully automated infrastructure. We can achieve following benefits with Continuous Delivery approach:
+Build Java apps, container images and push images to Azure Container Registry
+using Maven and [Jib](https://github.com/GoogleContainerTools/jib/tree/master/jib-maven-plugin):
+ 
+```bash
+cd config
+mvn compile jib:build -Djib.container.environment=CONFIG_SERVICE_PASSWORD=${CONFIG_SERVICE_PASSWORD}
 
-- The ability to release software anytime
-- Any build could end up being a release
-- Build artifacts once - deploy as needed
+cd ../registry
+mvn compile jib:build
 
-Here is a simple Continuous Delivery workflow, implemented in this project:
+cd ../gateway
+mvn compile jib:build
 
-<img width="880" src="https://cloud.githubusercontent.com/assets/6069066/14159789/0dd7a7ce-f6e9-11e5-9fbb-a7fe0f4431e3.png">
+cd ../auth-service
+mvn compile jib:build
 
-In this [configuration](https://github.com/sqshq/PiggyMetrics/blob/master/.travis.yml), Travis CI builds tagged images for each successful git push. So, there are always `latest` image for each microservice on [Docker Hub](https://hub.docker.com/r/sqshq/) and older images, tagged with git commit hash. It's easy to deploy any of them and quickly rollback, if needed.
+cd ../account-service
+mvn compile jib:build -Djib.container.environment=ACCOUNT_SERVICE_PASSWORD=${ACCOUNT_SERVICE_PASSWORD}
 
-## How to run all the things?
+cd ../statistics-service
+mvn compile jib:build -Djib.container.environment=STATISTICS_SERVICE_PASSWORD=${STATISTICS_SERVICE_PASSWORD}
 
-Keep in mind, that you are going to start 8 Spring Boot applications, 4 MongoDB instances and RabbitMq. Make sure you have `4 Gb` RAM available on your machine. You can always run just vital services though: Gateway, Registry, Config, Auth Service and Account Service.
+cd ../notification-service
+mvn compile jib:build -Djib.container.environment=NOTIFICATION_SERVICE_PASSWORD=${NOTIFICATION_SERVICE_PASSWORD}
 
-#### Before you start
-- Install Docker and Docker Compose.
-- Change environment variable values in `.env` file for more security or leave it as it is.
-- Make sure to build the project: `mvn package [-DskipTests]`
+```
+### Prepare Kubernetes manifest files
 
-#### Production mode
-In this mode, all latest images will be pulled from Docker Hub.
-Just copy `docker-compose.yml` and hit `docker-compose up`
+Prepare Kubernetes manifest files using the supplied `bash` script:
 
-#### Development mode
-If you'd like to build images yourself (with some changes in the code, for example), you have to clone all repository and build artifacts with maven. Then, run `docker-compose -f docker-compose.yml -f docker-compose.dev.yml up`
+```bash
+# cd to kubernetes folder
+cd ../kubernetes
+source ../.scripts/prepare-kubernetes-manifest-files.sh
 
-`docker-compose.dev.yml` inherits `docker-compose.yml` with additional possibility to build images locally and expose all containers ports for convenient development.
+```
+### Create Secrets in Kubernetes
 
-If you'd like to start applications in Intellij Idea you need to either use [EnvFile plugin](https://plugins.jetbrains.com/plugin/7861-envfile) or manually export environment variables listed in `.env` file (make sure they were exported: `printenv`)
+You can create Secrets in Kubernetes:
+```bash
+kubectl apply -f deploy/0-secrets.yaml
 
-#### Important endpoints
-- http://localhost:80 - Gateway
-- http://localhost:8761 - Eureka Dashboard
-- http://localhost:9000/hystrix - Hystrix Dashboard (Turbine stream link: `http://turbine-stream-service:8080/turbine/turbine.stream`)
-- http://localhost:15672 - RabbitMq management (default login/password: guest/guest)
+# you can view Secrets in Kubernetes using:
+kubectl get secret piggymetrics -o yaml
+```
 
-#### Notes
-All Spring Boot applications require already running [Config Server](https://github.com/sqshq/PiggyMetrics#config-service) for startup. But we can start all containers simultaneously because of `depends_on` docker-compose option.
+### Deploy Spring Cloud Config Server
 
-Also, Service Discovery mechanism needs some time after all applications startup. Any service is not available for discovery by clients until the instance, the Eureka server and the client all have the same metadata in their local cache, so it could take 3 heartbeats. Default heartbeat period is 30 seconds.
+You can deploy the Spring Cloud Config Server to Kubernetes:
+```bash
+kubectl apply -f deploy/1-config.yaml
+```
 
-## Contributions are welcome!
+### Deploy Spring Cloud Service Registry
 
-PiggyMetrics is open source, and would greatly appreciate your help. Feel free to suggest and implement improvements.
+You can deploy the Spring Cloud Service Registry to Kubernetes:
+```bash
+kubectl apply -f deploy/2-registry.yaml
+```
+
+You can validate that a Spring Cloud Config Server is up and running by
+invoking its REST API.
+
+The Spring Cloud Config Server REST API has resources in the following form:
+
+```bash
+/{application}/{profile}[/{label}]
+/{application}-{profile}.yml
+/{label}/{application}-{profile}.yml
+/{application}-{profile}.properties
+/{label}/{application}-{profile}.properties
+```
+
+You can get IP addresses of Spring Cloud Config Server and Spring Cloud Service Registry 
+using `kubectl`:
+
+```bash
+kubectl get services
+NAME         TYPE           CLUSTER-IP    EXTERNAL-IP     PORT(S)          AGE
+config       LoadBalancer   10.0.34.171   51.143.50.77    8888:31892/TCP   3m15s
+kubernetes   ClusterIP      10.0.0.1      <none>          443/TCP          3h42m
+registry     LoadBalancer   10.0.198.13   52.137.96.211   8761:31689/TCP   6s
+```
+
+Try:
+```bash
+open http://<EXTERNAL-IP-of-config>:8888/gateway/profile
+open http://<EXTERNAL-IP-of-config>:8888/account-service/profile
+open http://<EXTERNAL-IP-of-config>:8888/statistics-service/profile
+open http://<EXTERNAL-IP-of-config>:8888/notification-service/profile
+...
+open http://<EXTERNAL-IP-of-config>:8888/notification-service/profile/development
+...
+```
+
+![](./media/spring-cloud-config-server-running-in-kubernetes.jpg)
+
+You can validate that a Spring Cloud Service Registry is up and running by 
+opening the Service Registry Dashboard:
+
+```bash
+open http://<EXTERNAL-IP-of-registry>:8761/
+```
+
+![](./media/spring-cloud-service-registry-running-in-kubernetes-01.jpg)
+
+### Deploy Spring Cloud Gateway
+
+You can deploy the Spring Cloud Service Registry to Kubernetes:
+```bash
+kubectl apply -f deploy/3-gateway.yaml
+```
+
+### Deploy 4 Spring Cloud micro service apps 
+
+You can deploy Spring Cloud micro service apps to Kubernetes:
+
+```bash
+kubectl apply -f deploy/4-auth-service.yaml
+kubectl apply -f deploy/5-account-service.yaml
+kubectl apply -f deploy/6-statistics-service.yaml
+kubectl apply -f deploy/7-notification-service.yaml
+```
+
+You can validate that Spring Cloud middleware components and micro service apps are running:
+
+```bash
+kubectl get services
+NAME                   TYPE           CLUSTER-IP     EXTERNAL-IP     PORT(S)          AGE
+account-service        ClusterIP      10.0.215.174   <none>          6000/TCP         108s
+auth-service           ClusterIP      10.0.164.45    <none>          5000/TCP         2m26s
+config                 LoadBalancer   10.0.34.171    51.143.50.77    8888:31892/TCP   24m
+gateway                LoadBalancer   10.0.154.13    52.143.88.12    80:31412/TCP     4m3s
+kubernetes             ClusterIP      10.0.0.1       <none>          443/TCP          4h3m
+notification-service   ClusterIP      10.0.169.231   <none>          8000/TCP         63s
+registry               LoadBalancer   10.0.198.13    52.137.96.211   8761:31689/TCP   21m
+statistics-service     ClusterIP      10.0.217.229   <none>          7000/TCP         76s
+```
+
+### Open the Spring Cloud micro service apps on Kubernetes
+
+Open the Piggymetrics landing page by using the`gateway' app's `EXTERNAL-IP`.
+
+```bash
+open http://<EXTERNAL-IP-of-gateway>/
+```
+
+For example: 
+
+![](./media/piggy-metrics-first-page.jpg)
+
+![](./media/piggy-metrics-second-page.jpg)
+
+![](./media/piggy-metrics-third-page.jpg)
+
+![](./media/piggy-metrics-fourth-page.jpg)
+
+## Troubleshooting micro service apps in Azure Spring Cloud
+
+With out-of-the-box support for aggregating logs, metrics, and 
+distributed app traces into Azure Monitor, you can easily visualize 
+how your applications are performing, detect and diagnose issues 
+across micro service applications and their dependencies, drill 
+into monitoring data for troubleshooting and gain better 
+understanding of what end-users do with your apps.
+
+### Debug in development machine
+You can run Spring Cloud Config, Spring Cloud Service Registry, 
+Spring Cloud Gateway and other Spring Cloud components on their dev machine. 
+You can attach debuggers to Spring Cloud micro service apps and step through them. You can 
+look at logs and metrics. Use Java Flight Recorder, etc.
+
+### Use aggregated logs and metrics in Azure Log Analytics
+
+You can aggregate logs in Azure Log Analytics and retrieve them 
+using Kusto queries. If you do not have a Log Analytics Workspace in Azure, 
+see [how to create a Log Analytics Workspace](./docs/create-log-analytics.md)
+
+You can onboard your Kubernetes cluster to Azure Monitor for monitoring, by clicking
+on the `Logs` blade in the Azure Portal and choosing your Log Analytics Workspace:
+
+![](./media/onboard-kubernetes-cluster-to-azure-monitor.jpg)
+
+
+You can then view logs using Kusto queires in the logs blade of your Azure Spring Cloud instance:
+![](./media/view-logs-in-log-analytics-workspace.jpg)
+
+Here are some sample Kusto queries for viewing logs for each of the micro service apps -
+please replace `java-on-aks` with your Azure Kubernetes cluster name:
+
+```sql
+let ContainerIdList = KubePodInventory
+| where ContainerName contains 'config'
+| where ClusterId contains 'java-on-aks'
+| distinct ContainerID;
+ContainerLog
+| where ContainerID in (ContainerIdList)
+| where LogEntry !contains "AI:" 
+| project LogEntrySource, LogEntry, TimeGenerated, Computer, Image, Name, ContainerID
+| order by TimeGenerated desc
+| render table
+
+let ContainerIdList = KubePodInventory
+| where ContainerName contains 'registry'
+| where ClusterId contains 'java-on-aks'
+| distinct ContainerID;
+ContainerLog
+| where ContainerID in (ContainerIdList)
+| where LogEntry !contains "AI:" 
+| project LogEntrySource, LogEntry, TimeGenerated, Computer, Image, Name, ContainerID
+| order by TimeGenerated desc
+| render table
+
+let ContainerIdList = KubePodInventory
+| where ContainerName contains 'gateway'
+| where ClusterId contains 'java-on-aks'
+| distinct ContainerID;
+ContainerLog
+| where ContainerID in (ContainerIdList)
+| where LogEntry !contains "AI:" 
+| project LogEntrySource, LogEntry, TimeGenerated, Computer, Image, Name, ContainerID
+| order by TimeGenerated desc
+| render table
+
+let ContainerIdList = KubePodInventory
+| where ContainerName contains 'account-service'
+| where ClusterId contains 'java-on-aks'
+| distinct ContainerID;
+ContainerLog
+| where ContainerID in (ContainerIdList)
+| where LogEntry !contains "AI:" 
+| project LogEntrySource, LogEntry, TimeGenerated, Computer, Image, Name, ContainerID
+| order by TimeGenerated desc
+| render table
+
+let ContainerIdList = KubePodInventory
+| where ContainerName contains 'auth-service'
+| where ClusterId contains 'java-on-aks'
+| distinct ContainerID;
+ContainerLog
+| where ContainerID in (ContainerIdList)
+| where LogEntry !contains "AI:" 
+| project LogEntrySource, LogEntry, TimeGenerated, Computer, Image, Name, ContainerID
+| order by TimeGenerated desc
+| render table
+
+```
+### Use Application Insights to monitor your micro service apps
+
+You can use Application Insights to monitor your live web application. It will 
+automatically detect performance anomalies. It includes powerful analytics tools to 
+help you diagnose issues and to understand what users actually do with your app. It is designed to 
+help you continuously improve performance and usability.
+
+If you do not have an instance of Application Insights, see
+ [how to create Application Insights](./docs/create-application-insights.md).
+
+Allow some time, then you can see distributed tracing:
+![](./media/distributed-tracing.jpg)
+
+You can also view the performance and call drill downs in the App Insights view:
+![](./media/view-performance-in-app-insights.jpg)
+
+## Automate and rapidly deploy changes to Azure Kubernetes Service - GitHub Actions or Azure Pipelines
+
+[To be filled by UshaN]
+
+## Rapidly deploy changes to Azure Spring Cloud without disruption - blue-green deployments
+
+[To be filled by UshaN]
+
+## Scale out micro service apps in Azure Kubernetes Service
+
+You can scale out micro service apps in Azure Kubernetes Service:
+```bash
+kubectl scale deployment gateway --replicas=4
+
+kubectl describe deployment gateway
+Name:                   gateway
+Namespace:              default
+CreationTimestamp:      Sat, 07 Dec 2019 22:36:27 -0800
+Labels:                 app=gateway
+                        project=piggymetrics
+                        tier=frontend
+Annotations:            deployment.kubernetes.io/revision: 1
+                        kubectl.kubernetes.io/last-applied-configuration:
+                          {"apiVersion":"extensions/v1beta1","kind":"Deployment","metadata":{"annotations":{},"labels":{"app":"gateway","project":"piggymetrics","ti...
+Selector:               app=gateway,project=piggymetrics,tier=frontend
+Replicas:               4 desired | 4 updated | 4 total | 4 available | 0 unavailable
+```
+
+## Congratulations
+
+Congratulations!! 
+
+You built, deployed, scaled out and setup monitoring for Spring Cloud micro service apps
+using Spring Boot and Spring Cloud, Azure Kubernetes Service, Azure Container Registry,
+Azure Monitor, Log Analytics and Application Insights.
+
+## Resources
+
+- [Azure Kubernetes Story](https://docs.microsoft.com/en-us/azure/aks/)
+- [Azure Container Registry](https://docs.microsoft.com/en-us/azure/container-registry/)
+- [Kusto Query Language](https://docs.microsoft.com/en-us/azure/kusto/query/)
+- [Triage Micro Service Applications using Application Map](https://docs.microsoft.com/en-us/azure/azure-monitor/app/app-map)
+- [Azure for Java Cloud Developers](https://docs.microsoft.com/en-us/azure/java/)
+- [Spring Cloud Azure](https://cloud.spring.io/spring-cloud-azure/)
+- [Spring Cloud](https://spring.io/projects/spring-cloud)
+- ...
+
+## Credits
+
+This Java micro services sample is forked from 
+[sqshq/Piggymetrics](https://github.com/sqshq/PiggyMetrics) - see [Piggymetrics README](./README-piggymetrics.md). 
+
+## Contributing
+
+This project welcomes contributions and suggestions.  Most contributions require you to agree to a
+Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
+the rights to use your contribution. For details, visit https://cla.opensource.microsoft.com.
+
+When you submit a pull request, a CLA bot will automatically determine whether you need to provide
+a CLA and decorate the PR appropriately (e.g., status check, comment). Simply follow the instructions
+provided by the bot. You will only need to do this once across all repos using our CLA.
+
+This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
+For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
+contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
