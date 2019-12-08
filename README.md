@@ -236,7 +236,7 @@ Jib is configured to start from a production-ready distribution of Java. For exa
     <version>1.8.0</version>
     <configuration>
         <from>
-            <!-- production-ready 
+            <!-- production-ready distribution of Java -->
             <image>mcr.microsoft.com/java/jre-headless:8u232-zulu-alpine</image>
         </from>
         <to>
