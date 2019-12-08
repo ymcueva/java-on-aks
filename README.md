@@ -575,9 +575,9 @@ to satisfy your deployments' business and technical requirements. See [Microserv
 - Define an application lifecyle for apps on Azure Kubernetes Service and use them
  across developer and DevOps automation tools. This lifecyle should include a 
  source-to-container strategy
-- Frame a plan to assume infrastructure management, including load balancers, clustering, 
+- Frame a plan to assume infrastructure management -- including load balancers, clustering, 
 security, SSL offloading, domain name mapping, etc.
-- Frame a plan to assume service management, configuration, managing secrets, backup & restore, 
+- Frame a plan to assume service management -- including configuration, managing secrets, backup & restore, 
 monitoring & log shipping, upgrades, auto-restart, auto-scale, etc. If you are deploying 
 Spring Cloud micro service apps, service management should include 
 strategies for dynamically scaling Spring Cloud middleware components - 
