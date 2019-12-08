@@ -31,8 +31,10 @@ This guide walks you through how to deploy and manage Java apps on Azure Kuberne
 - Resources
 
 -->
-![](./media/azure-spring-cloud-large.png)
-![](./media/java.jpeg) ![](./media/kubernetes.png) ![](./media/aks-logo.png) ![](./media/acr.png) ![](./media/docker.png) ![](./media/helm.png)
+
+<!--
+![](./media/java.jpeg) ![](./media/kubernetes.png) ![](./media/aks-logo.png) ![](./media/acr.png) 
+-->
 
 ## What will you experience
 
