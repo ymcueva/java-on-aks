@@ -16,22 +16,23 @@ This guide walks you through how to deploy and manage Java apps on the Azure Kub
 
 ## Editor's checklist
 - What will you experience (DONE)
-- What you will need
-- Start here
-- Build Piggymetrics - Spring Cloud micro service apps
-- Create Mongodb and RabbitMQ
-- Run Piggymetrics locally 
-- Create Azure Kubernetes Service and Azure Container Registry
-- Deploy Piggymetrics to Azure Kubernetes Service
-- Troubleshooting Java apps in Azure Kubernetes Service
+- What you will need (DONE)
+- Start here (DONE)
+- Build Piggymetrics - Spring Cloud micro service apps (NOT NEEDED)
+- Create Mongodb and RabbitMQ (DONE)
+- Run Piggymetrics locally (NOT NEEDED)
+- Create Azure Kubernetes Service and Azure Container Registry (DONE)
+- Deploy Piggymetrics to Azure Kubernetes Service (DONE)
+- Troubleshooting Java apps in Azure Kubernetes Service (DONE)
 - Automate and rapidly deploy changes to Azure Kubernetes Service - using GitHub Actions or Azure Pipelines
 - Rapidly deploy changes to Azure Spring Cloud without disruption - blue-green deployments
-- Scale out Java apps in Azure Kubernetes Service
-- Congratulations!
-- Resources
+- Scale out Java apps in Azure Kubernetes Service (DONE)
+- Congratulations! (DONE)
+- Resources 
 
 -->
 
+![](./media/java-on-aks.jpg)
 <!--
 ![](./media/java.jpeg) ![](./media/kubernetes.png) ![](./media/aks-logo.png) ![](./media/acr.png) 
 -->
