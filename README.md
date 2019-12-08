@@ -569,14 +569,14 @@ using Spring Boot and Spring Cloud, Azure Kubernetes Service, Azure Container Re
 Azure Monitor, Log Analytics and Application Insights.
 
 To advance Java deployments on Kubernetes to production, you should think 
-about the following next steps
+about the following next steps:
 - Frame a scalable infrastructure with Azure Kubernetes Service and Azure Container Registry
 to satisfy your deployments' business and technical requirements. See [Microservices architecture on Azure Kubernetes Service (AKS)](https://docs.microsoft.com/en-us/azure/architecture/reference-architectures/microservices/aks)
+- Frame a plan to assume infrastructure management -- including load balancers, clustering, 
+security, SSL offloading, domain name mapping, etc.
 - Define an application lifecyle for apps on Azure Kubernetes Service and use them
  across developer and DevOps automation tools. This lifecyle should include a 
  source-to-container strategy
-- Frame a plan to assume infrastructure management -- including load balancers, clustering, 
-security, SSL offloading, domain name mapping, etc.
 - Frame a plan to assume service management -- including configuration, managing secrets, backup & restore, 
 monitoring & log shipping, upgrades, auto-restart, auto-scale or manual-scale, etc. If you are deploying 
 Spring Cloud micro service apps, service management should include 
