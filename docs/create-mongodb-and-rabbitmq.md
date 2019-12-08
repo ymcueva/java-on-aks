@@ -4,6 +4,11 @@ This guide will walk you through HOW to create MongoDB and RabbitMQ in Azure.
 
 ## Prep the dev environment
 
+Make your own copy of the setup environment variables bash script:
+```bash
+cp .scripts/setup-env-variables-azure-template.sh .scripts/setup-env-variables-azure.sh
+```
+
 Prep the dev environment by populating environment variables in 
 `.scripts/setup-env-variables-azure.sh`
 bash script:
@@ -167,15 +172,15 @@ open http://${RABBITMQ_HOST}:15672
 ## Re-prep the local dev environment
 
 Re-prep the dev environment by populating environment variables in 
-`piggymetrics/.scripts/setup-env-variables-azure.sh` and
-`piggymetrics/.scripts/setup-env-variables-development.sh`
-bash scripts:
+`piggymetrics/.scripts/setup-env-variables-azure.sh` bash scripts and export them to
+your dev environment:
 
 ```bash
 # ====== Piggy Metrics Azure Coordinates
 export RESOURCE_GROUP=INSERT-your-resource-group-name
-export REGION=eastus
-export SPRING_CLOUD_SERVICE=INSERT-your-spring-cloud-service-name
+export REGION=westus2
+export AKS_CLUSTER=INSERT-your-AKS-cluster-name
+export CONTAINER_REGISTRY=INSERT-your-Azure-Container-Registry-name
 
 ## ===== Mongo DB
 export MONGODB_DATABASE=INSERT-your-mongodb-database-name

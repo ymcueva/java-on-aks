@@ -111,10 +111,14 @@ kubectl delete pod [pod-name]
 kubectl delete deployment [deployment-name]
 kubectl delete service [service-name]
 kubectl get secret piggymetrics -o yaml
+kubectl get node
+kubectl describe node [node-name]
 
 http://.../actuator
 
 # https://codefresh.io/kubernetes-tutorial/kubernetes-cheat-sheet/
+# https://kubernetes.io/docs/reference/kubectl/cheatsheet/
+# https://kubernetes.io/docs/tasks/debug-application-cluster/
 
 # ========= old stuff =================
 

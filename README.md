@@ -83,12 +83,16 @@ cd java-on-aks
 
 You can create MongoDB and RabbitMQ on Azure by following steps outlined [here](./docs/create-mongodb-and-rabbitmq.md)
 and capture MongoDB and RabbitMQ coordinates and credentials in 
-`setup-env-variables-development.sh` 
-and `setup-env-variables-azure.sh`. 
+`setup-env-variables-azure.sh`. 
 
 ## Create Azure Container Registry and Azure Kubernetes Service
 
 ### Create Azure Container Registry
+If you have not yet setup the development environment, 
+make your own copy of the setup environment variables bash script:
+```bash
+cp .scripts/setup-env-variables-azure-template.sh .scripts/setup-env-variables-azure.sh
+```
 
 Prep the dev environment by populating environment variables in 
 `.scripts/setup-env-variables-azure.sh`
@@ -160,6 +164,9 @@ az aks get-credentials --name ${AKS_CLUSTER} \
 ```
 
 ### Auto instrument for monitoring Java apps on Azure Kubernetes Service
+
+If you do not have an instance of Application Insights, see
+ [how to create Application Insights](./docs/create-application-insights.md).
 
 Download Java agent ([download link](https://github.com/microsoft/Application-Insights-K8s-Codeless-Attach/releases))
 for auto instrumenting for monitoring Java apps on Azure Kubernetes Service.
@@ -368,6 +375,25 @@ Spring Cloud Gateway and other Spring Cloud components on their dev machine.
 You can attach debuggers to Spring Cloud micro service apps and step through them. You can 
 look at logs and metrics. Use Java Flight Recorder, etc.
 
+### Stream logs from micro service apps in cloud to development machines
+Soon, you will be able to stream logs from an app to your development machine using `kubectl`, like:
+```bash
+# Stream logs from Spring Cloud Config Server
+kubectl logs -f --timestamps=true -l app=config
+
+# Stream logs from Spring Cloud Service Registry
+kubectl logs -f --timestamps=true -l app=registry
+
+# Stream logs from Spring Cloud Gateway
+kubectl logs -f --timestamps=true -l app=gateway
+
+# Stream logs from Spring Cloud micro service apps
+kubectl logs -f --timestamps=true -l app=auth-service
+kubectl logs -f --timestamps=true -l app=account-service
+kubectl logs -f --timestamps=true -l app=statistics-service
+kubectl logs -f --timestamps=true -l app=notification-service
+```
+
 ### Use aggregated logs and metrics in Azure Log Analytics
 
 You can aggregate logs in Azure Log Analytics and retrieve them 
@@ -450,10 +476,8 @@ automatically detect performance anomalies. It includes powerful analytics tools
 help you diagnose issues and to understand what users actually do with your app. It is designed to 
 help you continuously improve performance and usability.
 
-If you do not have an instance of Application Insights, see
- [how to create Application Insights](./docs/create-application-insights.md).
-
-Allow some time, then you can see distributed tracing:
+Allow some time, then you can see distributed tracing in the 
+configured Application Insights instance. Go to the `Application Map' blade in the Azure Portal:
 ![](./media/distributed-tracing.jpg)
 
 You can also view the performance and call drill downs in the App Insights view:
@@ -461,11 +485,11 @@ You can also view the performance and call drill downs in the App Insights view:
 
 ## Automate and rapidly deploy changes to Azure Kubernetes Service - GitHub Actions or Azure Pipelines
 
-[To be filled by UshaN]
+- To be supplied
 
 ## Rapidly deploy changes to Azure Spring Cloud without disruption - blue-green deployments
 
-[To be filled by UshaN]
+- To be supplied
 
 ## Scale out micro service apps in Azure Kubernetes Service
 
