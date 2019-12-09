@@ -25,7 +25,7 @@ This guide walks you through how to deploy and manage Java apps on the Azure Kub
 - Deploy Piggymetrics to Azure Kubernetes Service (DONE)
 - Troubleshooting Java apps in Azure Kubernetes Service (DONE)
 - Automate and rapidly deploy changes to Azure Kubernetes Service - using GitHub Actions or Azure Pipelines
-- Rapidly deploy changes to Azure Spring Cloud without disruption - blue-green deployments
+- Rapidly deploy changes to Azure Kubernetes without disruption - blue-green deployments
 - Scale out Java apps in Azure Kubernetes Service (DONE)
 - Congratulations! (DONE)
 - Resources 
@@ -47,7 +47,7 @@ micro service architecture pattern using Spring Boot and Spring Cloud
 - Deploy Piggymetrics to Azure Kubernetes Service
 - Troubleshoot Java apps in Azure Kubernetes Service
 - Automate and rapidly deploy changes to Azure Kubernetes Service - using GitHub Actions or Azure Pipelines
-- Rapidly deploy changes to Azure Spring Cloud without disruption - blue-green deployments
+- Rapidly deploy changes to Azure Kubernetes without disruption - blue-green deployments
 - Scale out Java apps in Azure Kubernetes Service
 - Learn about next steps to production
 
@@ -536,7 +536,7 @@ Also, you can view the performance and call drill downs in the `Performance` bla
 
 - To be supplied
 
-## Rapidly deploy changes to Azure Spring Cloud without disruption - blue-green deployments
+## Rapidly deploy changes to Azure Kubernetes Service without disruption - blue-green deployments
 
 - To be supplied
 
