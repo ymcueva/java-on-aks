@@ -18,13 +18,14 @@ variables:
   STATISTICS_SERVICE_PORT: '7000'
   NOTIFICATION_SERVICE_PORT: '8000'
   vmImageName: 'ubuntu-latest'
+  IMAGE_TAG: azp-${{ github.sha }} 
   
 
 stages:
 - stage: Build 
-  displayName: Build & Push Container Images
+  displayName: Build stage
   jobs:  
-  - job: Build
+  - job: Build & Push Container Images
     displayName: Build
     pool:
       vmImage: $(vmImageName)
@@ -36,19 +37,13 @@ stages:
         KeyVaultName: 'piggymetrics'
         SecretsFilter: '*'
 
-    - task: replacetokens@3
-      displayName: Replace variables in all the pom files
-      inputs:
-        targetFiles: '$(Pipeline.Workspace)/*/*/pom.xml'
-        keepToken: true
-        tokenPrefix: '${'
-        tokenSuffix: '}'
-
     - task: Bash@3
       displayName: Build container images for each service
       inputs:
         targetType: 'inline'
         script: |
+          export CONTAINER_REGISTRY=$(CONTAINER_REGISTRY)
+          export IMAGE_TAG=$(IMAGE_TAG)
           echo 'Install ACR AAD credential helper and login'
 
           curl -L https://aka.ms/acr/installaad/bash | /bin/bash
@@ -108,7 +103,7 @@ stages:
               SecretsFilter: '*'
           
           - task: replacetokens@3
-            displayName: Replace CONTAINER_REGISTRY name in all the manifest files
+            displayName: Replace CONTAINER_REGISTRY & IMAGE_TAG in all the manifest files
             inputs:
               targetFiles: '$(Pipeline.Workspace)/kubernetes/*.yaml'
               tokenPrefix: '${'
