@@ -48,6 +48,7 @@ stages:
 
           curl -L https://aka.ms/acr/installaad/bash | /bin/bash
           az acr login -n $(CONTAINER_REGISTRY)
+          docker login -u $(AZURE-REGISTRY-USERNAME) -p $(AZURE-REGISTRY-PASSWORD) $(CONTAINER_REGISTRY).azurecr.io
 
           echo 'Start Build'
 
