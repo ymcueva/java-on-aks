@@ -1,0 +1,78 @@
+# This workflow will build a docker container, publish it to Azure Container Registry, and deploy it to Azure Kubernetes Service.
+#
+# To configure this workflow:
+#
+# 1. Set up the following secrets in your workspace: 
+#     a. AZURE_REGISTRY_USERNAME with ACR username
+#     b. AZURE_REGISTRY_PASSWORD with ACR Password
+#     c. AZURE_CREDENTIALS with the output of `az ad sp create-for-rbac --sdk-auth`
+#
+# 2. Change the values for the CONTAINER_REGISTRY, CLUSTER_NAME, CLUSTER_RESOURCE_GROUP and NAMESPACE environment variables (below).
+
+name: Deploy to AKS
+on: [push]
+
+# Environment variables available to all jobs and steps in this workflow
+env:
+  CLUSTER_NAME: aks4microservices
+  CLUSTER_RESOURCE_GROUP: devops-java-microservices-to-aks
+  NAMESPACE: piggymetrics
+  CONTAINER_REGISTRY: javademosregistry
+  
+jobs:
+  deploy-to-aks:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    # Set the target Azure Kubernetes Service (AKS) cluster. 
+    - uses: azure/aks-set-context@v1
+      with:
+        creds: '${{ secrets.AZURE_CREDENTIALS }}'
+        cluster-name: ${{ env.CLUSTER_NAME }}
+        resource-group: ${{ env.CLUSTER_RESOURCE_GROUP }}
+    # Create namespace if doesn't exist
+    - run: |
+        kubectl create namespace ${{ env.NAMESPACE }} --dry-run -o json | kubectl apply -f -
+    
+    # Create imagepullsecret for Azure Container registry (ACR)
+    - uses: azure/k8s-create-secret@v1
+      with:
+        container-registry-url: ${{ env.CONTAINER_REGISTRY }}.azurecr.io
+        container-registry-username: ${{ secrets.AZURE_REGISTRY_USERNAME }}
+        container-registry-password: ${{ secrets.AZURE_REGISTRY_PASSWORD }}
+        secret-name: ${{ env.CONTAINER_REGISTRY }}-registry-connection
+        namespace: ${{ env.NAMESPACE }}
+    
+    # Create generic secrets to be available on pods
+    - uses: azure/k8s-create-secret@v1
+      with:
+        namespace: ${{ env.NAMESPACE }}
+        secret-type: 'generic'
+        arguments: --from-literal=config_service_password=${{ secrets.CONFIG_SERVICE_PASSWORD }} --from-literal=notification_service_password=${{ secrets.NOTIFICATION_SERVICE_PASSWORD }} --from-literal=statistics_service_password=${{ secrets.STATISTICS_SERVICE_PASSWORD }} --from-literal=account_service_password=${{ secrets.ACCOUNT_SERVICE_PASSWORD }} --from-literal=rabbitmq_password=${{ secrets.RABBITMQ_PASSWORD }} --from-literal=mongodb_uri=${{ secrets.MONGODB_URI }}  --from-literal=mongodb_database=${{ secrets.MONGODB_DATABASE }} --from-literal=rabbitmq_username=${{ secrets.RABBITMQ_USERNAME }} --from-literal=rabbitmq_host=${{ secrets.RABBITMQ_HOST }} --from-literal=rabbitmq_port=${{ secrets.RABBITMQ_PORT }}  --from-literal=notification_email_user=${{ secrets.NOTIFICATION_EMAIL_USER }} --from-literal=notification_email_pass=${{ secrets.NOTIFICATION_EMAIL_PASSWORD }}  --from-literal=notification_email_host=${{ secrets.NOTIFICATION_EMAIL_HOST }} --from-literal=notification_email_port=${{ secrets.NOTIFICATION_EMAIL_PORT }} 
+        secret-name: piggymetrics
+    
+     # Replace CONTAINER_REGISTRY name in all the manifest files
+    - uses: cschleiden/replace-tokens@v1
+      with:
+        tokenPrefix: '${'
+        tokenSuffix: '}'
+        files: '["kubernetes/*.yaml"]'
+      env:
+        CONTAINER_REGISTRY: ${{ env.CONTAINER_REGISTRY }}
+    
+     # Start an instance of Spring Cloud Config
+     
+     # Deploy app to AKS
+    - uses: azure/k8s-deploy@replaceLogic
+      with:
+        manifests: |
+          kubernetes/1-config.yaml
+          kubernetes/2-registry.yaml
+          kubernetes/3-gateway.yaml
+          kubernetes/4-auth-service.yaml
+          kubernetes/5-account-service.yaml
+          kubernetes/6-statistics-service.yaml
+          kubernetes/7-notification-service.yaml
+        imagepullsecrets: |
+          ${{ env.CONTAINER_REGISTRY }}-registry-connection
+        namespace: ${{ env.NAMESPACE }}
