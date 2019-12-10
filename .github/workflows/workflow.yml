@@ -30,8 +30,8 @@ jobs:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
     
     - run: |
-         export CONTAINER_REGISTRY: ${{ secrets.AZURE_CONTAINER_REGISTRY }}
-         export IMAGE_TAG= ${{ env.IMAGE_TAG }}
+         export CONTAINER_REGISTRY=${{ secrets.AZURE_CONTAINER_REGISTRY }}
+         export IMAGE_TAG=${{ env.IMAGE_TAG }}
          echo 'Install ACR AAD credential helper and login'
           curl -L https://aka.ms/acr/installaad/bash | /bin/bash
           az acr login -n ${{ secrets.AZURE_CONTAINER_REGISTRY }}
