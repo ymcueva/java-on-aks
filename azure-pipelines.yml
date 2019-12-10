@@ -1,4 +1,4 @@
-# Deploy piggymetrics to Azure Kubernetes Service
+# Build and Deploy piggymetrics to Azure Kubernetes Service
 # Build and push image to Azure Container Registry; Deploy to Azure Kubernetes Service
 # https://docs.microsoft.com/azure/devops/pipelines/languages/docker
 
@@ -9,17 +9,20 @@ resources:
 - repo: self
 
 variables:
-
-  # Container registry service connection established during pipeline creation
   dockerRegistryServiceConnection: 'ee9a5046-aa3b-4a81-ac5d-3a0c6603dd75'
   CONTAINER_REGISTRY: 'javademosregistry'
-
-  # Agent VM image name
+  CONFIG_PORT: '8888'
+  REGISTRY_PORT: '8761'
+  GATEWAY_PORT: '4000'
+  ACCOUNT_SERVICE_PORT: '6000'
+  AUTH_SERVICE_PORT: '5000'
+  STATISTICS_SERVICE_PORT: '7000'
+  NOTIFICATION_SERVICE_PORT: '8000'
   vmImageName: 'ubuntu-latest'
   
 
 stages:
-- stage: Build
+- stage: Build & Push Container Images
   displayName: Build stage
   jobs:  
   - job: Build
@@ -27,6 +30,60 @@ stages:
     pool:
       vmImage: $(vmImageName)
     steps:
+    - task: AzureKeyVault@1
+      displayName: Fetch secrets from Azure Key vault
+      inputs:
+        azureSubscription: 'Java Demos 2'
+        KeyVaultName: 'piggymetrics'
+        SecretsFilter: '*'
+
+    - task: replacetokens@3
+      displayName: Replace variables in all the pom files
+      inputs:
+        targetFiles: '$(Pipeline.Workspace)/*/*/pom.xml'
+        keepToken: true
+        tokenPrefix: '${'
+        tokenSuffix: '}'
+
+    - task: Bash@3
+      displayName: Build container images for each service
+      inputs:
+        targetType: 'inline'
+        script: |
+          echo 'Install ACR AAD credential helper and login'
+
+          curl -L https://aka.ms/acr/installaad/bash | /bin/bash
+          az acr login -n $(CONTAINER_REGISTRY)
+
+          echo 'Start Build'
+
+          cd config
+          mvn compile jib:build \
+              -Djib.container.environment=CONFIG_SERVICE_PASSWORD=$(CONFIG-SERVICE-PASSWORD)
+          
+          cd ../registry
+          mvn compile jib:build
+          
+          cd ../gateway
+          mvn compile jib:build
+          
+          cd ../auth-service
+          mvn compile jib:build
+          
+          cd ../account-service
+          mvn compile jib:build \
+              -Djib.container.environment=ACCOUNT_SERVICE_PASSWORD=$(ACCOUNT-SERVICE-PASSWORD)
+          
+          cd ../statistics-service
+          mvn compile jib:build \
+              -Djib.container.environment=STATISTICS_SERVICE_PASSWORD=$(STATISTICS-SERVICE-PASSWORD)
+          
+          cd ../notification-service
+          mvn compile jib:build \
+              -Djib.container.environment=NOTIFICATION_SERVICE_PASSWORD=$(NOTIFICATION-SERVICE-PASSWORD)
+          
+          echo 'Build complete'
+
     - publish: kubernetes
       artifact: kubernetes
 
