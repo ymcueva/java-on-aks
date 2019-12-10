@@ -12,17 +12,7 @@ variables:
 
   # Container registry service connection established during pipeline creation
   dockerRegistryServiceConnection: 'ee9a5046-aa3b-4a81-ac5d-3a0c6603dd75'
-  - task: replacetokens@3
-  inputs:
-    rootDirectory: 'kubernetes/*'
-    targetFiles: 'kubernetes/*.yaml'
-    encoding: 'auto'
-    writeBOM: true
-    actionOnMissing: 'warn'
-    keepToken: false
-    tokenPrefix: '${'
-    tokenSuffix: '}'
-    emptyValue: '$(containerRegistry)': 'javademosregistry.azurecr.io'
+  containerRegistry: 'javademosregistry.azurecr.io'
   imagePullSecret: 'javademosregistry4921c2ff-auth'
 
   # Agent VM image name
@@ -71,7 +61,7 @@ stages:
           
           - task: replacetokens@3
             inputs:
-              rootDirectory: '$(Pipeline.Workspace)/kubernetes/'
+              rootDirectory: '$(Pipeline.Workspace)/kubernetes/*'
               targetFiles: '*.yaml'
               encoding: 'auto'
               writeBOM: true
