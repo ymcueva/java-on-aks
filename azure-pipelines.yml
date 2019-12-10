@@ -12,8 +12,7 @@ variables:
 
   # Container registry service connection established during pipeline creation
   dockerRegistryServiceConnection: 'ee9a5046-aa3b-4a81-ac5d-3a0c6603dd75'
-  containerRegistry: 'javademosregistry.azurecr.io'
-  imagePullSecret: 'javademosregistry4921c2ff-auth'
+  CONTAINER_REGISTRY: 'javademosregistry'
 
   # Agent VM image name
   vmImageName: 'ubuntu-latest'
@@ -49,7 +48,7 @@ stages:
             displayName: Create imagePullSecret
             inputs:
               action: createSecret
-              secretName: $(imagePullSecret)
+              secretName: '$(CONTAINER_REGISTRY)-registry-connection'
               dockerRegistryEndpoint: $(dockerRegistryServiceConnection)
 
           - task: AzureKeyVault@1
@@ -60,16 +59,11 @@ stages:
               SecretsFilter: '*'
           
           - task: replacetokens@3
+            displayName: Replace CONTAINER_REGISTRY name in all the manifest files
             inputs:
-              rootDirectory: '$(Pipeline.Workspace)/kubernetes/*'
-              targetFiles: '*.yaml'
-              encoding: 'auto'
-              writeBOM: true
-              actionOnMissing: 'warn'
-              keepToken: false
+              targetFiles: '$(Pipeline.Workspace)/kubernetes/*.yaml'
               tokenPrefix: '${'
               tokenSuffix: '}'
-              emptyValue: '$(containerRegistry)'
 
           - task: KubernetesManifest@0
             displayName: Create generic secrets to be available on pods
@@ -77,8 +71,9 @@ stages:
               action: 'createSecret'
               secretType: 'generic'
               secretName: 'piggymetrics'
-              secretArguments: '--from-literal=config_service_password=$(CONFIG-SERVICE-PASSWORD) --from-literal=notification_service_password=$(NOTIFICATION-SERVICE-PASSWORD) --from-literal=statistics_service_password=$(STATISTICS-SERVICE-PASSWORD) --from-literal=account_service_password=$(ACCOUNT-SERVICE-PASSWORD) --from-literal=rabbitmq_password=$(RABBITMQ-PASSWORD) --from-literal=mongodb_uri=$(MONGODB-URI)  --from-literal=mongodb_database=$(MONGODB-DATABASE) --from-literal=rabbitmq_username=$(RABBITMQ-USERNAME) --from-literal=rabbitmq_host=$(RABBITMQ-HOST) --from-literal=rabbitmq_port=$(RABBITMQ-PORT)  --from-literal=notification_email_user=$(SMTP-USER) --from-literal=notification_email_pass=$(SMTP-PASSWORD)'
-              
+              secretArguments: '--from-literal=config_service_password=$(CONFIG-SERVICE-PASSWORD) --from-literal=notification_service_password=$(NOTIFICATION-SERVICE-PASSWORD) --from-literal=statistics_service_password=$(STATISTICS-SERVICE-PASSWORD) --from-literal=account_service_password=$(ACCOUNT-SERVICE-PASSWORD) --from-literal=rabbitmq_password=$(RABBITMQ-PASSWORD) --from-literal=mongodb_uri=$(MONGODB-URI)  --from-literal=mongodb_database=$(MONGODB-DATABASE) --from-literal=rabbitmq_username=$(RABBITMQ-USERNAME) --from-literal=rabbitmq_host=$(RABBITMQ-HOST) --from-literal=rabbitmq_port=$(RABBITMQ-PORT)  --from-literal=notification_email_user=$(SMTP-USER) --from-literal=notification_email_pass=$(SMTP-PASSWORD) --from-literal=notification_email_host=$(NOTIFICATION-EMAIL-HOST) --from-literal=notification_email_port=$(NOTIFICATION-EMAIL-PORT)'
+
+
           - task: KubernetesManifest@0
             displayName: Deploy to Kubernetes cluster
             inputs:
@@ -92,4 +87,4 @@ stages:
                 $(Pipeline.Workspace)/kubernetes/6-statistics-service.yaml
                 $(Pipeline.Workspace)/kubernetes/7-notification-service.yaml
               imagePullSecrets: |
-                $(imagePullSecret)
+                '$(CONTAINER_REGISTRY)-registry-connection'
