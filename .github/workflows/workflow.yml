@@ -7,11 +7,65 @@
 #     d. All the other app specific config parameters
 
 
-name: Deploy to AKS
+name: Build & Deploy to AKS
 on: [push]
+env:
+  CONFIG_PORT: '8888'
+  REGISTRY_PORT: '8761'
+  GATEWAY_PORT: '4000'
+  ACCOUNT_SERVICE_PORT: '6000'
+  AUTH_SERVICE_PORT: '5000'
+  STATISTICS_SERVICE_PORT: '7000'
+  NOTIFICATION_SERVICE_PORT: '8000'
+  IMAGE_TAG: ga-${{ github.sha }} 
 
 jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+ 
+    - uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+    
+    - run: |
+         export CONTAINER_REGISTRY: ${{ secrets.AZURE_CONTAINER_REGISTRY }}
+         export IMAGE_TAG= ${{ env.IMAGE_TAG }}
+         echo 'Install ACR AAD credential helper and login'
+          curl -L https://aka.ms/acr/installaad/bash | /bin/bash
+          az acr login -n ${{ secrets.AZURE_CONTAINER_REGISTRY }}
+          echo 'Start Build'
+          cd config
+          mvn compile jib:build \
+              -Djib.container.environment=CONFIG_SERVICE_PASSWORD=${{ secrets.CONFIG_SERVICE_PASSWORD }} 
+
+          cd ../registry
+          mvn compile jib:build 
+
+          cd ../gateway
+          mvn compile jib:build
+
+          cd ../auth-service
+          mvn compile jib:build 
+          
+          cd ../account-service
+          mvn compile jib:build \
+              -Djib.container.environment=ACCOUNT_SERVICE_PASSWORD=${{ secrets.ACCOUNT_SERVICE_PASSWORD }} 
+               
+          cd ../statistics-service
+          mvn compile jib:build \
+              -Djib.container.environment=STATISTICS_SERVICE_PASSWORD=${{ secrets.STATISTICS_SERVICE_PASSWORD }} 
+
+          cd ../notification-service
+          mvn compile jib:build \
+              -Djib.container.environment=NOTIFICATION_SERVICE_PASSWORD=${{ secrets.NOTIFICATION_SERVICE_PASSWORD }} 
+
+          echo 'Build complete'
+      
+    
   deploy-to-aks:
+    needs: build
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
@@ -25,15 +79,7 @@ jobs:
     - run: |
         kubectl create namespace ${{ secrets.AKS_NAMESPACE }} --dry-run -o json | kubectl apply -f -
     
-    # Create imagepullsecret for Azure Container registry (ACR)
-    - uses: azure/k8s-create-secret@v1
-      with:
-        container-registry-url: ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io
-        container-registry-username: ${{ secrets.AZURE_REGISTRY_USERNAME }}
-        container-registry-password: ${{ secrets.AZURE_REGISTRY_PASSWORD }}
-        secret-name: ${{ secrets.AZURE_CONTAINER_REGISTRY }}-registry-connection
-        namespace: ${{ secrets.AKS_NAMESPACE }}
-    
+   
     # Create generic secrets to be available on pods
     - uses: azure/k8s-create-secret@v1
       with:
@@ -42,7 +88,8 @@ jobs:
         arguments: --from-literal=config_service_password=${{ secrets.CONFIG_SERVICE_PASSWORD }} --from-literal=notification_service_password=${{ secrets.NOTIFICATION_SERVICE_PASSWORD }} --from-literal=statistics_service_password=${{ secrets.STATISTICS_SERVICE_PASSWORD }} --from-literal=account_service_password=${{ secrets.ACCOUNT_SERVICE_PASSWORD }} --from-literal=rabbitmq_password=${{ secrets.RABBITMQ_PASSWORD }} --from-literal=mongodb_uri=${{ secrets.MONGODB_URI }}  --from-literal=mongodb_database=${{ secrets.MONGODB_DATABASE }} --from-literal=rabbitmq_username=${{ secrets.RABBITMQ_USERNAME }} --from-literal=rabbitmq_host=${{ secrets.RABBITMQ_HOST }} --from-literal=rabbitmq_port=${{ secrets.RABBITMQ_PORT }}  --from-literal=notification_email_user=${{ secrets.NOTIFICATION_EMAIL_USER }} --from-literal=notification_email_pass=${{ secrets.NOTIFICATION_EMAIL_PASSWORD }}  --from-literal=notification_email_host=${{ secrets.NOTIFICATION_EMAIL_HOST }} --from-literal=notification_email_port=${{ secrets.NOTIFICATION_EMAIL_PORT }} 
         secret-name: piggymetrics
     
-     # Replace CONTAINER_REGISTRY name in all the manifest files
+    
+     # Replace CONTAINER_REGISTRY & IMAGE_TAG  in all the manifest files
     - uses: cschleiden/replace-tokens@v1
       with:
         tokenPrefix: '${'
@@ -50,9 +97,9 @@ jobs:
         files: '["kubernetes/*.yaml"]'
       env:
         CONTAINER_REGISTRY: ${{ secrets.AZURE_CONTAINER_REGISTRY }}
+        IMAGE_TAG: ${{ env.IMAGE_TAG }}
     
-     # Start an instance of Spring Cloud Config
-     
+    
      # Deploy app to AKS
     - uses: azure/k8s-deploy@replaceLogic
       with:
@@ -64,6 +111,4 @@ jobs:
           kubernetes/5-account-service.yaml
           kubernetes/6-statistics-service.yaml
           kubernetes/7-notification-service.yaml
-        imagepullsecrets: |
-          ${{ secrets.AZURE_CONTAINER_REGISTRY }}-registry-connection
         namespace: ${{ secrets.AKS_NAMESPACE }}
