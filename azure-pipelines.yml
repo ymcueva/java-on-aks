@@ -22,8 +22,8 @@ variables:
   
 
 stages:
-- stage: Build & Push Container Images
-  displayName: Build stage
+- stage: Build 
+  displayName: Build & Push Container Images
   jobs:  
   - job: Build
     displayName: Build
@@ -93,7 +93,7 @@ stages:
 
   jobs:
   - deployment: Deploy
-    displayName: Deploy
+    displayName: Deploy to AKS
     pool:
       vmImage: $(vmImageName)
     environment: 'Piggymetrics.piggymetrics-azp'
