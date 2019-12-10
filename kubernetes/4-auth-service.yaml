@@ -70,7 +70,7 @@ spec:
             secretKeyRef:
               name: piggymetrics
               key: mongodb_uri
-        image: ${CONTAINER_REGISTRY}.azurecr.io/piggymetrics-auth-service
+        image: ${CONTAINER_REGISTRY}.azurecr.io/piggymetrics-auth-service:${IMAGE_TAG}
         name: auth-service
         ports:
           - containerPort: 5000

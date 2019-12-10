@@ -46,7 +46,7 @@ spec:
             secretKeyRef:
               name: piggymetrics
               key: config_service_password
-        image: ${CONTAINER_REGISTRY}.azurecr.io/piggymetrics-gateway
+        image: ${CONTAINER_REGISTRY}.azurecr.io/piggymetrics-gateway:${IMAGE_TAG}
         ports:
         - containerPort: 4000
       restartPolicy: Always

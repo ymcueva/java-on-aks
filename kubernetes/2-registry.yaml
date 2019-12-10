@@ -46,7 +46,7 @@ spec:
             secretKeyRef:
               name: piggymetrics
               key: config_service_password
-        image: ${CONTAINER_REGISTRY}.azurecr.io/piggymetrics-registry
+        image: ${CONTAINER_REGISTRY}.azurecr.io/piggymetrics-registry:${IMAGE_TAG}
         name: registry
         ports:
         - containerPort: 8761

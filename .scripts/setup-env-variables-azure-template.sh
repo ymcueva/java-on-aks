@@ -9,6 +9,8 @@ export REGION=westus2
 export AKS_CLUSTER=INSERT-your-AKS-cluster-name
 export CONTAINER_REGISTRY=INSERT-your-Azure-Container-Registry-name
 
+export IMAGE_TAG=INSERT-your-tag-for-container-images
+
 # ====== Docker image port configuration ======
 export CONFIG_PORT=8888
 export REGISTRY_PORT=8761

@@ -102,7 +102,7 @@ spec:
               key: rabbitmq_password
         ports:
           - containerPort: 8000
-        image: ${CONTAINER_REGISTRY}.azurecr.io/piggymetrics-notification-service
+        image: ${CONTAINER_REGISTRY}.azurecr.io/piggymetrics-notification-service:${IMAGE_TAG}
         name: notification-service
         resources: {}
       restartPolicy: Always

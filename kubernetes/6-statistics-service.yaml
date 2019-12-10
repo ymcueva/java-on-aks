@@ -82,7 +82,7 @@ spec:
               key: rabbitmq_password
         ports:
           - containerPort: 7000
-        image: ${CONTAINER_REGISTRY}.azurecr.io/piggymetrics-statistics-service
+        image: ${CONTAINER_REGISTRY}.azurecr.io/piggymetrics-statistics-service:${IMAGE_TAG}
         name: statistics-service
         resources: {}
       restartPolicy: Always
