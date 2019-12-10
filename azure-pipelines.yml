@@ -9,7 +9,6 @@ resources:
 - repo: self
 
 variables:
-  dockerRegistryServiceConnection: 'ee9a5046-aa3b-4a81-ac5d-3a0c6603dd75'
   CONTAINER_REGISTRY: 'javademosregistry'
   CONFIG_PORT: '8888'
   REGISTRY_PORT: '8761'
@@ -101,13 +100,6 @@ stages:
       runOnce:
         deploy:
           steps:
-          - task: KubernetesManifest@0
-            displayName: Create imagePullSecret
-            inputs:
-              action: createSecret
-              secretName: '$(CONTAINER_REGISTRY)-registry-connection'
-              dockerRegistryEndpoint: $(dockerRegistryServiceConnection)
-
           - task: AzureKeyVault@1
             displayName: Fetch secrets from Azure Key vault
             inputs:
@@ -143,5 +135,3 @@ stages:
                 $(Pipeline.Workspace)/kubernetes/5-account-service.yaml
                 $(Pipeline.Workspace)/kubernetes/6-statistics-service.yaml
                 $(Pipeline.Workspace)/kubernetes/7-notification-service.yaml
-              imagePullSecrets: |
-                '$(CONTAINER_REGISTRY)-registry-connection'
