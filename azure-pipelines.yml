@@ -18,7 +18,7 @@ variables:
   STATISTICS_SERVICE_PORT: '7000'
   NOTIFICATION_SERVICE_PORT: '8000'
   vmImageName: 'ubuntu-latest'
-  IMAGE_TAG: azp-${{ github.sha }} 
+  IMAGE_TAG: '$(Build.BuildId)'
   
 
 stages:
