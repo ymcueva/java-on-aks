@@ -10,7 +10,7 @@ urlFragment: "java-on-aks"
 
 # End-to-end experience - Java on AKS
 
-![](https://github.com/actions/java-on-aks/workflows/Build%20&%20Deploy%20to%20AKS/badge.svg)
+![](https://github.com/actions/java-on-aks/workflows/Build%20%26%20Deploy%20to%20AKS/badge.svg)
 
 This guide walks you through how to deploy and manage Java apps on the Azure Kubernetes Service.
 
