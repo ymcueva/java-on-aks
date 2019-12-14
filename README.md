@@ -541,8 +541,8 @@ Also, you can view the performance and call drill downs in the `Performance` bla
 
 There are some additional prerequisites for this automation:
 
-|[GitHub Account](https://github.com/)
-|[Azure DevOps Organization](https://docs.microsoft.com/en-us/azure/devops/pipelines/get-started/pipelines-sign-up?view=azure-devops)
+| [GitHub Account](https://github.com/)
+| [Azure DevOps Organization](https://docs.microsoft.com/en-us/azure/devops/pipelines/get-started/pipelines-sign-up?view=azure-devops)
 |
 
 ### Azure Pipelines
