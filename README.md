@@ -10,6 +10,9 @@ urlFragment: "java-on-aks"
 
 # End-to-end experience - Java on AKS
 
+![](https://github.com/actions/java-on-aks/workflows/GitHub%20Actions/badge.svg)
+
+
 This guide walks you through how to deploy and manage Java apps on the Azure Kubernetes Service.
 
 <!--
@@ -534,7 +537,32 @@ Also, you can view the performance and call drill downs in the `Performance` bla
 
 ## Automate and rapidly deploy changes to Azure Kubernetes Service - GitHub Actions or Azure Pipelines
 
-- To be supplied
+### Prerequisites
+
+There are some additional prerequisites for this automation:
+
+|[GitHub Account](https://github.com/)
+|[Azure DevOps Organization](https://docs.microsoft.com/en-us/azure/devops/pipelines/get-started/pipelines-sign-up?view=azure-devops)
+|
+
+### Azure Pipelines
+
+Sign into Azure Pipelines and Create a Pipeline using the 
+[`azure-pipelines.yml`](./azure-pipelines.yml) file. Create an Azure KeyVault and upload secrets.
+
+![](./media/azure-pipelines-01.jpg)
+![](./media/azure-pipelines-02.jpg) 
+
+### GitHub Actions
+
+You can configure a 
+[Workflow to automate build and deploy](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/configuring-a-workflow) 
+in GitHub 
+using the [`workflow.yml`](./.github/workflows/workflow.yml). Use the steps outlined in
+[Creating and Encrypting Secrets in GitHub](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/creating-and-using-encrypted-secrets)
+and create secrets for every parameter in `.scripts/setup-env-variables-azure-template.sh`.
+
+![](./media/github-actions-01.jpg)
 
 ## Rapidly deploy changes to Azure Kubernetes Service without disruption - blue-green deployments
 
@@ -597,6 +625,9 @@ Spring Cloud Service Registry, Spring Cloud Gateway, etc.
 - [Azure for Java Cloud Developers](https://docs.microsoft.com/en-us/azure/java/)
 - [Spring Cloud Azure](https://cloud.spring.io/spring-cloud-azure/)
 - [Spring Cloud](https://spring.io/projects/spring-cloud)
+- [Azure Pipelines - Build and Deploy to Azure Kubernetes Service](https://docs.microsoft.com/en-us/azure/devops/pipelines/ecosystems/kubernetes/aks-template)
+- [Azure Pipelines - Azure Key Vault Task](https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/deploy/azure-key-vault)
+- [GitHub Actions - Workflow to automate build and deploy](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/configuring-a-workflow)
 - ...
 
 ## Credits
