@@ -29,6 +29,14 @@ jobs:
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
     
+    - name: Azure key vault - Get Secrets
+      uses: Azure/get-keyvault-secrets@v1
+      with:
+        # Name of the azure key vault
+       keyvault: ${{ secrets.AZURE_KEY_VAULT }}
+        # Name of the secret to be fetched
+       secrets:  '*'
+    
     - run: |
          export CONTAINER_REGISTRY=${{ secrets.AZURE_CONTAINER_REGISTRY }}
          export IMAGE_TAG=${{ env.IMAGE_TAG }}
