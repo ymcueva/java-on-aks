@@ -38,15 +38,15 @@ jobs:
        secrets:  '*'
     
     - run: |
-         export CONTAINER_REGISTRY=${{ secrets.AZURE_CONTAINER_REGISTRY }}
+         export CONTAINER_REGISTRY=${{ env.AZURE-CONTAINER-REGISTRY }}
          export IMAGE_TAG=${{ env.IMAGE_TAG }}
          echo 'Install ACR AAD credential helper and login'
           curl -L https://aka.ms/acr/installaad/bash | /bin/bash
-          az acr login -n ${{ secrets.AZURE_CONTAINER_REGISTRY }}
+          az acr login -n ${{ env.AZURE-CONTAINER-REGISTRY }}
           echo 'Start Build'
           cd config
           mvn compile jib:build \
-              -Djib.container.environment=CONFIG_SERVICE_PASSWORD=${{ secrets.CONFIG_SERVICE_PASSWORD }} 
+              -Djib.container.environment=CONFIG_SERVICE_PASSWORD=${{ env.CONFIG-SERVICE-PASSWORD }} 
 
           cd ../registry
           mvn compile jib:build 
@@ -59,15 +59,15 @@ jobs:
           
           cd ../account-service
           mvn compile jib:build \
-              -Djib.container.environment=ACCOUNT_SERVICE_PASSWORD=${{ secrets.ACCOUNT_SERVICE_PASSWORD }} 
+              -Djib.container.environment=ACCOUNT_SERVICE_PASSWORD=${{ env.ACCOUNT-SERVICE-PASSWORD }} 
                
           cd ../statistics-service
           mvn compile jib:build \
-              -Djib.container.environment=STATISTICS_SERVICE_PASSWORD=${{ secrets.STATISTICS_SERVICE_PASSWORD }} 
+              -Djib.container.environment=STATISTICS_SERVICE_PASSWORD=${{ env.STATISTICS-SERVICE-PASSWORD }} 
 
           cd ../notification-service
           mvn compile jib:build \
-              -Djib.container.environment=NOTIFICATION_SERVICE_PASSWORD=${{ secrets.NOTIFICATION_SERVICE_PASSWORD }} 
+              -Djib.container.environment=NOTIFICATION_SERVICE_PASSWORD=${{ env.NOTIFICATION-SERVICE-PASSWORD }} 
 
           echo 'Build complete'
       
