@@ -25,12 +25,12 @@ jobs:
     steps:
     - uses: actions/checkout@master
  
-    - uses: azure/login@v1
+    - uses: Azure/login@v1
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
     
     - name: Azure key vault - Get Secrets
-      uses: Azure/get-keyvault-secrets@v1
+      uses: azure/get-keyvault-secrets@v1
       with:
         # Name of the azure key vault
        keyvault: ${{ secrets.AZURE_KEY_VAULT }}
