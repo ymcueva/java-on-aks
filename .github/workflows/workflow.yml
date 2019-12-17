@@ -87,7 +87,14 @@ jobs:
     - run: |
         kubectl create namespace ${{ secrets.AKS_NAMESPACE }} --dry-run -o json | kubectl apply -f -
     
-   
+    - name: Azure key vault - Get Secrets
+      uses: azure/get-keyvault-secrets@v1
+      with:
+        # Name of the azure key vault
+       keyvault: ${{ secrets.AZURE_KEY_VAULT }}
+        # Name of the secret to be fetched
+       secrets:  '*'
+       
     # Create generic secrets to be available on pods
     - uses: azure/k8s-create-secret@v1
       with:
