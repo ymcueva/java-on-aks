@@ -400,7 +400,7 @@ For example:
 
 ![](./media/piggy-metrics-fourth-page.jpg)
 
-## Troubleshooting micro service apps in Azure Spring Cloud
+## Troubleshooting micro service apps in Azure Kubernetes Service
 
 With out-of-the-box support for aggregating logs, metrics, and 
 distributed app traces into Azure Monitor, you can easily visualize 
