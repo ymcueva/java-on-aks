@@ -536,18 +536,38 @@ Also, you can view the performance and call drill downs in the `Performance` bla
 
 ## Automate and rapidly deploy changes to Azure Kubernetes Service - GitHub Actions or Azure Pipelines
 
+Create an Azure Pipelines CI/CD pipeline that automatically builds the code and deploys it to the Azure Kubernetes Cluster whenever there's a commit to the repository.
+
 ### Prerequisites
 
 There are some additional prerequisites for this automation:
 
 | [GitHub Account](https://github.com/)
 | [Azure DevOps Organization](https://docs.microsoft.com/en-us/azure/devops/pipelines/get-started/pipelines-sign-up?view=azure-devops)
-|
-
+| [Environment with AKS resource](https://docs.microsoft.com/en-us/azure/devops/pipelines/process/environments-kubernetes?view=azure-devops#azure-kubernetes-service) which creates a service account in the chosen cluster and namespace, which will be used by Azure DevOps account to deploy to AKS
+| [Azure service connection using service principal](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/connect-to-azure?view=azure-devops#create-an-azure-resource-manager-service-connection-with-an-existing-service-principal) to establish authentication between Azure & Azure DevOps services
+> [!Important]
+   > To simplify the service connection, use the same email address for Azure DevOps as you use for Azure.
+| Create an Azure KeyVault and upload secrets. Ensure the service principal used in the service connection above has GET, LIST [permissions](https://docs.microsoft.com/en-us/cli/azure/keyvault?view=azure-cli-latest#az-keyvault-set-policy) on the vault. Use below command for that:
+```
+az keyvault set-policy -n $KV_NAME --secret-permissions get list --spn <clientId from the Azure SPN JSON>
+```  
+ 
 ### Azure Pipelines
 
-Sign into Azure Pipelines and Create a Pipeline using the 
-[`azure-pipelines.yml`](./azure-pipelines.yml) file. Create an Azure KeyVault and upload secrets.
+Sign into Azure Pipelines and Create a Pipeline using the [`azure-pipelines.yml`](./azure-pipelines.yml) file. 
+
+Take a look at the pipeline to see what it does. Make sure that all the default inputs are appropriate for your code.
+
+The YAML file contains the following key elements:
+
+- The `trigger` at the top indicates the commits that trigger the pipeline, such as commits to the `master` branch.
+- The `variables` which parameterize the YAML template
+- The `stages`
+   - Build `stage`, which builds your project, and a Deploy stage, which deploys it to Azure as a Linux web app.
+   - Deploy `stage` also refers the Environment with Kubernetes resource. Ensure to modify the environment name to the one that you have created.
+- [AzureKeyVault]() task is used in both the stages to fetch the secrets from Azure Key Vault instance and set as variables. In the `Deploy` stage, these variables are used to set secrets in the pods.
+- [Kubernetes Manifest task](https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/deploy/kubernetes-manifest?view=azure-devops) has the added benefits of being able to check for object stability before marking a task as success/failure, perform artifact substitution, add pipeline traceability-related annotations onto deployed objects, simplify creation and referencing of imagePullSecrets
 
 ![](./media/azure-pipelines-01.jpg)
 ![](./media/azure-pipelines-02.jpg) 
