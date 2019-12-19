@@ -591,15 +591,15 @@ in GitHub
 using the [`workflow.yml`](./.github/workflows/workflow.yml). 
 
 - Create secrets for every parameter in `.scripts/setup-env-variables-azure-template.sh`.
-- For configuring App secrets, You could either set them as [GitHub Secrets](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/creating-and-using-encrypted-secrets) or fetch them from an Azure Key Vault instance.
+    - Set [GitHub Repo Secrets](https://aka.ms/create-secrets-for-GitHub-workflows) AZURE_CREDENTIALS, AKS_CLUSTER_NAME, AKS_RESOURCE_GROUP and AKS_NAMESPACE with Azure creds, AKS cluster name, resource group name and namespace
+    - For configuring App secrets, You could either set them as [GitHub Secrets](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/creating-and-using-encrypted-secrets) or fetch them from an Azure Key Vault instance.
 - `workflow.yml` contains the following key elements:
 
-- The `on: [push]` at the top indicates the commits that trigger the pipeline, such as every commit to the branch.
-- The `env:` with variables which parameterize the YAML template
-- The `jobs`
-   - Build `job`, which builds your app, and a Deploy `job`, which deploys it to AKS cluster. Each job has `steps` which either `uses` an `action` or `run` a script, all of which execute on a hosted-runner defined by `runs-on`.
-- [AzureKeyVault](https://github.com/Azure/get-keyvault-secrets) action is used in both the jobs to fetch the secrets from Azure Key Vault instance and set as environment variables. In the `Deploy` job, these variables are used to set secrets in the pods.
-- [Actions to deploy to AKS](https://github.com/Azure/actions-workflow-samples/tree/master/Kubernetes) are then used to create imagepullsecret, set secrets on pods and finally to deploy to AKS cluster.
+    - The `on: [push]` at the top indicates the commits that trigger the pipeline, such as every commit to the branch.
+    - The `env:` with variables which parameterize the YAML template
+    - The `jobs` : Build `job`, which builds your app, and a Deploy `job`, which deploys it to AKS cluster. Each job has `steps` which either `uses` an `action` or `run` a script, all of which execute on a hosted-runner defined by `runs-on`.
+    - [AzureKeyVault](https://github.com/Azure/get-keyvault-secrets) action is used in both the jobs to fetch the secrets from Azure Key Vault instance and set as environment variables. In the `Deploy` job, these variables are used to set secrets in the pods.
+    - [Actions to deploy to AKS](https://github.com/Azure/actions-workflow-samples/tree/master/Kubernetes) are then used to create imagepullsecret, set secrets on pods and finally to deploy to AKS cluster.
 
 ![](./media/github-actions-01.jpg)
 
