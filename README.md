@@ -555,33 +555,33 @@ az keyvault set-policy -n $KV_NAME --secret-permissions get list --spn <clientId
  
 ### Azure Pipelines
 
-Sign into Azure Pipelines and Create a Pipeline using the [`azure-pipelines.yml`](./azure-pipelines.yml) file. 
+1. Sign into Azure Pipelines and Create a Pipeline using the [`azure-pipelines.yml`](./azure-pipelines.yml) file. 
 
-Take a look at the pipeline to see what it does. Make sure that all the default inputs are appropriate for your code.
+2. Take a look at the pipeline to see what it does. Make sure that all the default inputs are appropriate for your code.
 
-The azure-pipelines.yml file contains the following key elements:
+    The azure-pipelines.yml file contains the following key elements:
 
-- The `trigger` at the top indicates the commits that trigger the pipeline, such as commits to the `master` branch.
-- The `variables` which parameterize the YAML template
-- The `stages`
-   - Build `stage`, which builds your app, and a Deploy `stage`, which deploys it to AKS cluster.
-   - Deploy `stage` also refers the Environment with Kubernetes resource. Ensure to modify the environment name to the one that you have created.
-- [AzureKeyVault](https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/deploy/azure-key-vault?view=azure-devops) task is used in both the stages to fetch the secrets from Azure Key Vault instance and set as variables. In the `Deploy` stage, these variables are used to set secrets in the pods.
-- [Kubernetes Manifest task](https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/deploy/kubernetes-manifest?view=azure-devops) has the added benefits of being able to check for object stability before marking a task as success/failure, perform artifact substitution, add pipeline traceability-related annotations onto deployed objects, simplify creation and referencing of imagePullSecrets
+    - The `trigger` at the top indicates the commits that trigger the pipeline, such as commits to the `master` branch.
+    - The `variables` which parameterize the YAML template
+    - The `stages`
+       - Build `stage`, which builds your app, and a Deploy `stage`, which deploys it to AKS cluster.
+       - Deploy `stage` also refers the Environment with Kubernetes resource. Ensure to modify the environment name to the one that you have created.
+    - [AzureKeyVault](https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/deploy/azure-key-vault?view=azure-devops) task is used in both the stages to fetch the secrets from Azure Key Vault instance and set as variables. In the `Deploy` stage, these variables are used to set secrets in the pods.
+    - [Kubernetes Manifest task](https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/deploy/kubernetes-manifest?view=azure-devops) has the added benefits of being able to check for object stability before marking a task as success/failure, perform artifact substitution, add pipeline traceability-related annotations onto deployed objects, simplify creation and referencing of imagePullSecrets
 
-![](./media/azure-pipelines-01.jpg)
+    ![](./media/azure-pipelines-01.jpg)
 
-After you've looked at what the pipeline does, select Save and run, after which you're prompted for a commit message because Azure Pipelines adds the azure-pipelines.yml file to your repository. After editing the message, select Save and run again to see your pipeline in action.
+3. After you've looked at what the pipeline does, select Save and run, after which you're prompted for a commit message because Azure Pipelines adds the azure-pipelines.yml file to your repository. After editing the message, select Save and run again to see your pipeline in action.
 
-As your pipeline runs, watch as your build stage, and then your deployment stage, go from blue (running) to green (completed). You can select the stages and jobs to watch your pipeline in action.
+4. As your pipeline runs, watch as your build stage, and then your deployment stage, go from blue (running) to green (completed). You can select the stages and jobs to watch your pipeline in action.
 
-![](./media/azure-pipelines-02.jpg) 
+    ![](./media/azure-pipelines-02.jpg) 
 
-Additionally, you can also explore Kubernetes objects created and the deployment history for the App by navigating to the "**Environment**". 
-- From the pipeline **summary** -> Select the **Environments** tab -> Select **View environment**
-- **Resources** view within the environment provides a glimpse of the status of objects within the namespace mapped to the resource. It also overlays pipeline traceability on top of these objects so that one can trace back from a Kubernetes object to the pipeline and then back to the commit.
+5. Additionally, you can also explore Kubernetes objects created and the deployment history for the App by navigating to the "**Environment**". 
+    - From the pipeline **summary** -> Select the **Environments** tab -> Select **View environment**
+    - **Resources** view within the environment provides a glimpse of the status of objects within the namespace mapped to the resource. It also overlays pipeline traceability on top of these objects so that one can trace back from a Kubernetes object to the pipeline and then back to the commit.
 
-![](./media/azure-pipelines-03.jpg) 
+    ![](./media/azure-pipelines-03.jpg) 
 
 ### GitHub Actions
 
