@@ -536,30 +536,70 @@ Also, you can view the performance and call drill downs in the `Performance` bla
 
 ## Automate and rapidly deploy changes to Azure Kubernetes Service - GitHub Actions or Azure Pipelines
 
+Create an Azure Pipelines CI/CD pipeline that automatically builds the code and deploys it to the Azure Kubernetes Cluster whenever there's a commit to the repository.
+
 ### Prerequisites
 
 There are some additional prerequisites for this automation:
 
-| [GitHub Account](https://github.com/)
-| [Azure DevOps Organization](https://docs.microsoft.com/en-us/azure/devops/pipelines/get-started/pipelines-sign-up?view=azure-devops)
-|
-
+- [GitHub Account](https://github.com/)
+- [Azure DevOps Organization](https://docs.microsoft.com/en-us/azure/devops/pipelines/get-started/pipelines-sign-up?view=azure-devops)
+- [Environment with AKS resource](https://docs.microsoft.com/en-us/azure/devops/pipelines/process/environments-kubernetes?view=azure-devops#azure-kubernetes-service) which creates a service account in the chosen cluster and namespace, which will be used by Azure DevOps account to deploy to AKS
+- [Azure service connection using service principal](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/connect-to-azure?view=azure-devops#create-an-azure-resource-manager-service-connection-with-an-existing-service-principal) to establish authentication between Azure & Azure DevOps services
+> [!Important]
+   > To simplify the service connection, use the same email address for Azure DevOps as you use for Azure.
+- Create an Azure KeyVault and upload secrets. Ensure the service principal used in the service connection above has GET, LIST [permissions](https://docs.microsoft.com/en-us/cli/azure/keyvault?view=azure-cli-latest#az-keyvault-set-policy) on the vault. Use below command for that:
+```
+az keyvault set-policy -n $KV_NAME --secret-permissions get list --spn <clientId from the Azure SPN JSON>
+```  
+ 
 ### Azure Pipelines
 
-Sign into Azure Pipelines and Create a Pipeline using the 
-[`azure-pipelines.yml`](./azure-pipelines.yml) file. Create an Azure KeyVault and upload secrets.
+1. Sign into Azure Pipelines and Create a Pipeline using the [`azure-pipelines.yml`](./azure-pipelines.yml) file. 
 
-![](./media/azure-pipelines-01.jpg)
-![](./media/azure-pipelines-02.jpg) 
+2. Take a look at the pipeline to see what it does. Make sure that all the default inputs are appropriate for your code.
+
+    The azure-pipelines.yml file contains the following key elements:
+
+    - The `trigger` at the top indicates the commits that trigger the pipeline, such as commits to the `master` branch.
+    - The `variables` which parameterize the YAML template
+    - The `stages`
+       - Build `stage`, which builds your app, and a Deploy `stage`, which deploys it to AKS cluster.
+       - Deploy `stage` also refers the Environment with Kubernetes resource. Ensure to modify the environment name to the one that you have created.
+    - [AzureKeyVault](https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/deploy/azure-key-vault?view=azure-devops) task is used in both the stages to fetch the secrets from Azure Key Vault instance and set as variables. In the `Deploy` stage, these variables are used to set secrets in the pods.
+    - [Kubernetes Manifest task](https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/deploy/kubernetes-manifest?view=azure-devops) has the added benefits of being able to check for object stability before marking a task as success/failure, perform artifact substitution, add pipeline traceability-related annotations onto deployed objects, simplify creation and referencing of imagePullSecrets
+
+    ![](./media/azure-pipelines-01.jpg)
+
+3. After you've looked at what the pipeline does, select Save and run, after which you're prompted for a commit message because Azure Pipelines adds the azure-pipelines.yml file to your repository. After editing the message, select Save and run again to see your pipeline in action.
+
+4. As your pipeline runs, watch as your build stage, and then your deployment stage, go from blue (running) to green (completed). You can select the stages and jobs to watch your pipeline in action.
+
+    ![](./media/azure-pipelines-02.jpg) 
+
+5. Additionally, you can also explore Kubernetes objects created and the deployment history for the App by navigating to the "**Environment**". 
+    - From the pipeline **summary** -> Select the **Environments** tab -> Select **View environment**
+    - **Resources** view within the environment provides a glimpse of the status of objects within the namespace mapped to the resource. It also overlays pipeline traceability on top of these objects so that one can trace back from a Kubernetes object to the pipeline and then back to the commit.
+
+    ![](./media/azure-pipelines-03.jpg) 
 
 ### GitHub Actions
 
-You can configure a 
+You can also configure a 
 [Workflow to automate build and deploy](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/configuring-a-workflow) 
 in GitHub 
-using the [`workflow.yml`](./.github/workflows/workflow.yml). Use the steps outlined in
-[Creating and Encrypting Secrets in GitHub](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/creating-and-using-encrypted-secrets)
-and create secrets for every parameter in `.scripts/setup-env-variables-azure-template.sh`.
+using the [`workflow.yml`](./.github/workflows/workflow.yml). 
+
+- Create secrets for every parameter in `.scripts/setup-env-variables-azure-template.sh`.
+    - Set [GitHub Repo Secrets](https://aka.ms/create-secrets-for-GitHub-workflows) AZURE_CREDENTIALS, AKS_CLUSTER_NAME, AKS_RESOURCE_GROUP and AKS_NAMESPACE with Azure creds, AKS cluster name, resource group name and namespace
+    - For configuring App secrets, You could either set them as [GitHub Secrets](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/creating-and-using-encrypted-secrets) or fetch them from an Azure Key Vault instance.
+- `workflow.yml` contains the following key elements:
+
+    - The `on: [push]` at the top indicates the commits that trigger the pipeline, such as every commit to the branch.
+    - The `env:` with variables which parameterize the YAML template
+    - The `jobs` : Build `job`, which builds your app, and a Deploy `job`, which deploys it to AKS cluster. Each job has `steps` which either `uses` an `action` or `run` a script, all of which execute on a hosted-runner defined by `runs-on`.
+    - [AzureKeyVault](https://github.com/Azure/get-keyvault-secrets) action is used in both the jobs to fetch the secrets from Azure Key Vault instance and set as environment variables. In the `Deploy` job, these variables are used to set secrets in the pods.
+    - [Actions to deploy to AKS](https://github.com/Azure/actions-workflow-samples/tree/master/Kubernetes) are then used to create imagepullsecret, set secrets on pods and finally to deploy to AKS cluster.
 
 ![](./media/github-actions-01.jpg)
 
