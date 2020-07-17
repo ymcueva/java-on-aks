@@ -67,8 +67,10 @@ Cut and paste the resource `'id'` value from Azure CLI response into
 
 ```bash
 # Get Cosmos DB connection strings  
-az cosmosdb list-connection-strings --resource-group ${RESOURCE_GROUP} \
-    --name ${MONGODB_USER} 
+az cosmosdb keys list \
+    --resource-group ${RESOURCE_GROUP} \
+    --name ${MONGODB_USER} \
+    --type connection-strings
 ```
 Cut and paste the primary connection string as `MONGODB_URI` in `setup-env-variables-azure.sh` bash file. 
 
