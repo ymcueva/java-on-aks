@@ -40,7 +40,7 @@ export MONGODB_RESOURCE_ID=INSERT-your-mongodb-resource-id
 ## ===== Rabbit MQ
 export RABBITMQ_RESOURCE_GROUP=INSERT-your-rabbitmq-resource-group-name
 export RABBITMQ_VM_NAME=INSERT-your-rabbitmq-virtual-machine-name
-export RABBITMQ_ADMIN_USERNAME=INSERT-your-rabbitmq-admin-user-name
+export RABBITMQ_VM_ADMIN_USERNAME=INSERT-your-rabbitmq-admin-user-name
 
 ## ===== Rabbit MQ
 export RABBITMQ_HOST=INSERT-your-rabbitmq-host-public-ip-address
