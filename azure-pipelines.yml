@@ -9,7 +9,7 @@ resources:
 - repo: self
 
 variables:
-  CONTAINER_REGISTRY: 'javademosregistry'
+  CONTAINER_REGISTRY: 'acr-workshop-demo'
   CONFIG_PORT: '8888'
   REGISTRY_PORT: '8761'
   GATEWAY_PORT: '4000'
@@ -33,8 +33,8 @@ stages:
     - task: AzureKeyVault@1
       displayName: Fetch secrets from Azure Key vault
       inputs:
-        azureSubscription: 'Java Demos 2'
-        KeyVaultName: 'piggymetrics'
+        azureSubscription: 'arm-workshop-demo'
+        KeyVaultName: 'kv-workshop-demo'
         SecretsFilter: '*'
 
     - task: Bash@3
@@ -99,8 +99,8 @@ stages:
           - task: AzureKeyVault@1
             displayName: Fetch secrets from Azure Key vault
             inputs:
-              azureSubscription: 'Java Demos 2'
-              KeyVaultName: 'piggymetrics'
+              azureSubscription: 'arm-workshop-demo'
+              KeyVaultName: 'kv-workshop-demo'
               SecretsFilter: '*'
           
           - task: replacetokens@3
