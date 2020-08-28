@@ -9,7 +9,7 @@ resources:
 - repo: self
 
 variables:
-  CONTAINER_REGISTRY: 'acr-workshop-demo'
+  CONTAINER_REGISTRY: 'acr061174'
   CONFIG_PORT: '8888'
   REGISTRY_PORT: '8761'
   GATEWAY_PORT: '4000'
