@@ -34,7 +34,7 @@ stages:
       displayName: Fetch secrets from Azure Key vault
       inputs:
         azureSubscription: 'arm-workshop-demo'
-        KeyVaultName: 'kv-workshop-demo'
+        KeyVaultName: 'kv-java-demo'
         SecretsFilter: '*'
 
     - task: Bash@3
