@@ -560,7 +560,7 @@ There are some additional prerequisites for this automation:
 
 ```
 AZURE-REGISTRY-USERNAME=00000000-0000-0000-0000-000000000000
-AZURE-REGISTRY-PASSWORD=<Token obtained according to [az acr login with --expose-token](https://docs.microsoft.com/en-us/azure/container-registry/container-registry-authentication)>
+AZURE-REGISTRY-PASSWORD=<Token obtained according to instrucciones in it url: https://docs.microsoft.com/en-us/azure/container-registry/container-registry-authentication>
 ``` 
 
 Ensure the service principal used in the service connection above has GET, LIST [permissions](https://docs.microsoft.com/en-us/cli/azure/keyvault?view=azure-cli-latest#az-keyvault-set-policy) on the vault. Use below command for that:
