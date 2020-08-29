@@ -9,9 +9,9 @@ metadata:
   name: auth-service
 spec:
   ports:
-  - name: http
-    port: 5000
-    targetPort: 5000
+    - name: http
+      port: 5000
+      targetPort: 5000
   selector:
     project: piggymetrics
     tier: infrastructure
@@ -19,7 +19,7 @@ spec:
 status:
   loadBalancer: {}
 ---
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
@@ -31,6 +31,9 @@ spec:
   replicas: 1
   strategy:
     type: RollingUpdate
+  selector:
+    matchLabels:
+        app: auth-service          
   template:
     metadata:
       labels:
@@ -39,41 +42,41 @@ spec:
         app: auth-service
     spec:
       containers:
-      - env:
-        - name: CONFIG_SERVICE_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: piggymetrics
-              key: config_service_password
-        - name: ACCOUNT_SERVICE_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: piggymetrics
-              key: account_service_password
-        - name: STATISTICS_SERVICE_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: piggymetrics
-              key: statistics_service_password
-        - name: NOTIFICATION_SERVICE_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: piggymetrics
-              key: notification_service_password
-        - name: MONGODB_DATABASE
-          valueFrom:
-            secretKeyRef:
-              name: piggymetrics
-              key: mongodb_database
-        - name: MONGODB_URI
-          valueFrom:
-            secretKeyRef:
-              name: piggymetrics
-              key: mongodb_uri
-        image: ${CONTAINER_REGISTRY}.azurecr.io/piggymetrics-auth-service:${IMAGE_TAG}
-        name: auth-service
-        ports:
-          - containerPort: 5000
-        resources: {}
+        - env:
+            - name: CONFIG_SERVICE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: piggymetrics
+                  key: config_service_password
+            - name: ACCOUNT_SERVICE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: piggymetrics
+                  key: account_service_password
+            - name: STATISTICS_SERVICE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: piggymetrics
+                  key: statistics_service_password
+            - name: NOTIFICATION_SERVICE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: piggymetrics
+                  key: notification_service_password
+            - name: MONGODB_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: piggymetrics
+                  key: mongodb_database
+            - name: MONGODB_URI
+              valueFrom:
+                secretKeyRef:
+                  name: piggymetrics
+                  key: mongodb_uri
+          image: ${CONTAINER_REGISTRY}.azurecr.io/piggymetrics-auth-service:${IMAGE_TAG}
+          name: auth-service
+          ports:
+            - containerPort: 5000
+          resources: {}
       restartPolicy: Always
 status: {}
