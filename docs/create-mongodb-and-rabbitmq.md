@@ -74,7 +74,7 @@ Cut and paste the primary connection string as `MONGODB_URI` in `setup-env-varia
 
 ## Create RabbitMQ
 
-Create an instance of Bitnami RabbitMQ Stack For Microsoft Azure, go to 
+Create an instance of RabbitMQ Certified by Bitnami For Microsoft Azure, go to 
 [https://portal.azure.com/#blade/Microsoft_Azure_Marketplace/MarketplaceOffersBlade/selectedMenuItemId/home/searchQuery/rabbitmq](https://portal.azure.com/#blade/Microsoft_Azure_Marketplace/MarketplaceOffersBlade/selectedMenuItemId/home/searchQuery/rabbitmq) 
 and start:
 
