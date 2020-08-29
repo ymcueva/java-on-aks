@@ -545,6 +545,9 @@ There are some additional prerequisites for this automation:
 - [GitHub Account](https://github.com/)
 - [Azure DevOps Organization](https://docs.microsoft.com/en-us/azure/devops/pipelines/get-started/pipelines-sign-up?view=azure-devops)
 - [Environment with AKS resource](https://docs.microsoft.com/en-us/azure/devops/pipelines/process/environments-kubernetes?view=azure-devops#azure-kubernetes-service) which creates a service account in the chosen cluster and namespace, which will be used by Azure DevOps account to deploy to AKS
+
+![](./media/azure-resource-environment.jpg)
+
 - [Azure service connection using service principal](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/connect-to-azure?view=azure-devops#create-an-azure-resource-manager-service-connection-with-an-existing-service-principal) to establish authentication between Azure & Azure DevOps services
 > [!Important]
    > To simplify the service connection, use the same email address for Azure DevOps as you use for Azure.
