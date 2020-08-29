@@ -74,11 +74,12 @@ Cut and paste the primary connection string as `MONGODB_URI` in `setup-env-varia
 
 ## Create RabbitMQ
 
-Create an instance of Bitnami RabbitMQ Stack For Microsoft Azure, go to 
+Create an instance of RabbitMQ Certified by Bitnami For Microsoft Azure, go to 
 [https://portal.azure.com/#blade/Microsoft_Azure_Marketplace/MarketplaceOffersBlade/selectedMenuItemId/home/searchQuery/rabbitmq](https://portal.azure.com/#blade/Microsoft_Azure_Marketplace/MarketplaceOffersBlade/selectedMenuItemId/home/searchQuery/rabbitmq) 
 and start:
 
 ![](../media/create-rabbitmq-on-azure-0.jpg)
+
 
 Fill in the form, use the same value as `RABBITMQ_RESOURCE_GROUP`, 
 `RABBITMQ_VM_NAME` and `RABBITMQ_VM_ADMIN_USERNAME`, and choose SSH. Select 'Standard DS3 v2' as 
@@ -91,7 +92,9 @@ Accept defaults:
 Accept defaults:
 ![](../media/create-rabbitmq-on-azure-2.jpg)
 
-Accept defaults in all subsequent screens, and proceed to create:
+Accept defaults in all subsequent screens (Don't forget to download the .pem file), and proceed to create:
+
+
 ![](../media/create-rabbitmq-on-azure-3.jpg)
 
 ![](../media/create-rabbitmq-on-azure-4.jpg)
@@ -113,7 +116,9 @@ and set the `RABBITMQ_HOST` environment variable in
 # First, export the environment variables
 source .scripts/setup-env-variables-azure.sh
 # Open an SSH connection
-ssh selvasingh@${RABBITMQ_HOST}
+chmod 400 rabbitmqxxxx.pem
+
+ssh -i rabbitmqxxxx.pem selvasingh@${RABBITMQ_HOST}   (selvassingh is your rabbitmq admin)
 ``` 
 
 You can adjust RabbitMQ to connect with clients from a different machine:
