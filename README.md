@@ -549,6 +549,9 @@ There are some additional prerequisites for this automation:
 ![](./media/azure-resource-environment.jpg)
 
 - [Azure service connection using service principal](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/connect-to-azure?view=azure-devops#create-an-azure-resource-manager-service-connection-with-an-existing-service-principal) to establish authentication between Azure & Azure DevOps services
+
+![](./media/kubernetes-service-connection.jpg)
+
 > [!Important]
    > To simplify the service connection, use the same email address for Azure DevOps as you use for Azure.
 - Create an Azure KeyVault and upload secrets. Ensure the service principal used in the service connection above has GET, LIST [permissions](https://docs.microsoft.com/en-us/cli/azure/keyvault?view=azure-cli-latest#az-keyvault-set-policy) on the vault. Use below command for that:
