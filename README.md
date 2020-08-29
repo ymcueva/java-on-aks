@@ -574,7 +574,7 @@ $KV_NAME = kv_java_demo
 
 Next, you must to copy the cliente Id.
 
-![](./media/cliente-id-service-principal.jpg)
+![](./media/client-id-service-principal.jpg)
 
 ```
 az keyvault set-policy -n $KV_NAME --secret-permissions get list --spn <clientId from the Azure SPN JSON>
