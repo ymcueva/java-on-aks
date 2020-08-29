@@ -10,15 +10,15 @@ metadata:
 spec:
   type: LoadBalancer
   ports:
-  - name: http
-    port: 80
-    targetPort: 4000
+    - name: http
+      port: 80
+      targetPort: 4000
   selector:
     project: piggymetrics
     tier: frontend
     app: gateway
 ---
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: gateway
@@ -30,6 +30,9 @@ spec:
   replicas: 1
   strategy:
     type: RollingUpdate
+  selector:
+    matchLabels:
+        app: gateway        
   template:
     metadata:
       creationTimestamp: null
@@ -39,14 +42,14 @@ spec:
         app: gateway
     spec:
       containers:
-      - name: gateway
-        env:
-        - name: CONFIG_SERVICE_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: piggymetrics
-              key: config_service_password
-        image: ${CONTAINER_REGISTRY}.azurecr.io/piggymetrics-gateway:${IMAGE_TAG}
-        ports:
-        - containerPort: 4000
+        - name: gateway
+          env:
+            - name: CONFIG_SERVICE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: piggymetrics
+                  key: config_service_password
+          image: ${CONTAINER_REGISTRY}.azurecr.io/piggymetrics-gateway:${IMAGE_TAG}
+          ports:
+            - containerPort: 4000
       restartPolicy: Always
