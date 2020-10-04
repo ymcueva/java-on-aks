@@ -9,7 +9,7 @@ resources:
 - repo: self
 
 variables:
-  CONTAINER_REGISTRY: 'acr061174'
+  CONTAINER_REGISTRY: 'acr00275'
   CONFIG_PORT: '8888'
   REGISTRY_PORT: '8761'
   GATEWAY_PORT: '4000'
@@ -34,7 +34,7 @@ stages:
       displayName: Fetch secrets from Azure Key vault
       inputs:
         azureSubscription: 'arm-workshop-demo'
-        KeyVaultName: 'kv-java-demo'
+        KeyVaultName: 'kv-ymcueva00275'
         SecretsFilter: '*'
 
     - task: Bash@3
@@ -100,7 +100,7 @@ stages:
             displayName: Fetch secrets from Azure Key vault
             inputs:
               azureSubscription: 'arm-workshop-demo'
-              KeyVaultName: 'kv-java-demo'
+              KeyVaultName: 'kv-ymcueva00275'
               SecretsFilter: '*'
           
           - task: replacetokens@3
