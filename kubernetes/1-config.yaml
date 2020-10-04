@@ -49,7 +49,7 @@ spec:
                 secretKeyRef:
                   name: piggymetrics
                   key: config_service_password
-          image: acr061174.azurecr.io/piggymetrics-config:dev
+          image: ${CONTAINER_REGISTRY}.azurecr.io/piggymetrics-config:dev
           name: config
           ports:
             - containerPort: 8888
