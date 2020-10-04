@@ -107,7 +107,7 @@ stages:
             displayName: Replace CONTAINER_REGISTRY & IMAGE_TAG in all the manifest files
             inputs:
               targetFiles: '$(Pipeline.Workspace)/kubernetes/*.yaml'
-              tokenPrefix: '${'
+              tokenPrefix: '{'
               tokenSuffix: '}'
 
           - task: KubernetesManifest@0
