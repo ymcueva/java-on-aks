@@ -95,12 +95,6 @@ stages:
               KeyVaultName: 'kv-ymcueva00275'
               SecretsFilter: '*'
           
-          - task: replacetokens@3
-            displayName: Replace CONTAINER_REGISTRY & IMAGE_TAG in all the manifest files
-            inputs:
-              targetFiles: '../kubernetes/*.yaml'
-              tokenPrefix: '${'
-              tokenSuffix: '}'
 
           - task: KubernetesManifest@0
             displayName: Create generic secrets to be available on pods
