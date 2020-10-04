@@ -129,5 +129,3 @@ stages:
                 $(Pipeline.Workspace)/kubernetes/3-gateway.yaml
                 $(Pipeline.Workspace)/kubernetes/4-auth-service.yaml
                 $(Pipeline.Workspace)/kubernetes/5-account-service.yaml
-                $(Pipeline.Workspace)/kubernetes/6-statistics-service.yaml
-                $(Pipeline.Workspace)/kubernetes/7-notification-service.yaml
