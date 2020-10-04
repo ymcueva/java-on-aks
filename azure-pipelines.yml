@@ -103,7 +103,7 @@ stages:
               KeyVaultName: 'kv-ymcueva00275'
               SecretsFilter: '*'
           
-          - task: colinsalmcorner.colinsalmcorner-buildtasks.replace-tokens-task.replaceTokens@1
+          - task: replacetokens@3
             displayName: Replace CONTAINER_REGISTRY & IMAGE_TAG in all the manifest files
             inputs:
               targetFiles: '$(Pipeline.Workspace)/kubernetes/*.yaml'
