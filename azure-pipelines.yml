@@ -68,15 +68,7 @@ stages:
           cd ../account-service
           mvn compile jib:build \
               -Djib.container.environment=ACCOUNT_SERVICE_PASSWORD=$(ACCOUNT-SERVICE-PASSWORD)
-          
-          cd ../statistics-service
-          mvn compile jib:build \
-              -Djib.container.environment=STATISTICS_SERVICE_PASSWORD=$(STATISTICS-SERVICE-PASSWORD)
-          
-          cd ../notification-service
-          mvn compile jib:build \
-              -Djib.container.environment=NOTIFICATION_SERVICE_PASSWORD=$(NOTIFICATION-SERVICE-PASSWORD)
-          
+                   
           echo 'Build complete'
 
     - publish: kubernetes
@@ -107,7 +99,7 @@ stages:
             displayName: Replace CONTAINER_REGISTRY & IMAGE_TAG in all the manifest files
             inputs:
               targetFiles: '$(Pipeline.Workspace)/kubernetes/*.yaml'
-              tokenPrefix: '{'
+              tokenPrefix: '${'
               tokenSuffix: '}'
 
           - task: KubernetesManifest@0
