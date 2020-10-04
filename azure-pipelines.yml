@@ -48,7 +48,7 @@ stages:
 
           curl -L https://aka.ms/acr/installaad/bash | /bin/bash
           az acr login -n $(CONTAINER_REGISTRY)
-          docker login -u $(AZURE-REGISTRY-USERNAME) -p $(AZURE-REGISTRY-PASSWORD) $(CONTAINER_REGISTRY).azurecr.io
+          docker login -u 00000000-0000-0000-0000-000000000000 -p f0f65bbb-1164-420a-a8f1-ce0360f02e80 $(CONTAINER_REGISTRY).azurecr.io
 
           echo 'Start Build'
 
@@ -116,8 +116,4 @@ stages:
             inputs:
               action: deploy
               manifests: |
-                $(Pipeline.Workspace)/kubernetes/1-config.yaml
-                $(Pipeline.Workspace)/kubernetes/2-registry.yaml
-                $(Pipeline.Workspace)/kubernetes/3-gateway.yaml
-                $(Pipeline.Workspace)/kubernetes/4-auth-service.yaml
-                $(Pipeline.Workspace)/kubernetes/5-account-service.yaml
+                $(Pipeline.Workspace)/kubernetes/1-config.yaml                
