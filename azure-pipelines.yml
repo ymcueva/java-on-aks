@@ -55,20 +55,7 @@ stages:
           cd config
           mvn compile jib:build \
               -Djib.container.environment=CONFIG_SERVICE_PASSWORD=$(CONFIG-SERVICE-PASSWORD)
-          
-          cd ../registry
-          mvn compile jib:build
-          
-          cd ../gateway
-          mvn compile jib:build
-          
-          cd ../auth-service
-          mvn compile jib:build
-          
-          cd ../account-service
-          mvn compile jib:build \
-              -Djib.container.environment=ACCOUNT_SERVICE_PASSWORD=$(ACCOUNT-SERVICE-PASSWORD)
-                   
+
           echo 'Build complete'
 
     - publish: kubernetes
@@ -110,4 +97,4 @@ stages:
             inputs:
               action: deploy
               manifests: |
-                ../kubernetes/1-config.yaml                
+                $(Pipeline.Workspace)/kubernetes/1-config.yaml                
